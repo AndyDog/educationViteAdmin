@@ -76,7 +76,7 @@ createCode()
     <ThemeSwitch class="theme-switch" />
     <div class="login-card">
       <div class="title">
-        <img src="@/assets/layout/logo-text-2.png" />
+        <img src="@/assets/layout/logo-text-1.png" />
       </div>
       <div class="content">
         <el-form ref="loginFormRef" :model="loginForm" :rules="loginFormRules" @keyup.enter="handleLogin">
@@ -156,6 +156,8 @@ createCode()
       height: 150px;
       img {
         height: 100%;
+        object-fit: contain;
+        width: 100%;
       }
     }
     .content {

@@ -35,13 +35,13 @@ const isCollapse = computed(() => {
 
 <template>
   <div :class="{ 'has-logo': showSidebarLogo }">
-    <SidebarLogo v-if="showSidebarLogo" :collapse="isCollapse" />
+    <!-- <SidebarLogo v-if="showSidebarLogo" :collapse="isCollapse" /> -->
     <el-scrollbar wrap-class="scrollbar-wrapper">
       <el-menu
         :default-active="activeMenu"
         :collapse="isCollapse"
-        :background-color="v3SidebarMenuBgColor"
-        :text-color="v3SidebarMenuTextColor"
+        background-color="#FFF"
+        text-color="#181818"
         :active-text-color="v3SidebarMenuActiveTextColor"
         :unique-opened="true"
         :collapse-transition="false"

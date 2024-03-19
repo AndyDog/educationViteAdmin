@@ -56,37 +56,37 @@ export const constantRoutes: RouteRecordRaw[] = [
       }
     ]
   },
-  {
-    path: "/unocss",
-    component: Layout,
-    redirect: "/unocss/index",
-    children: [
-      {
-        path: "index",
-        component: () => import("@/views/unocss/index.vue"),
-        name: "UnoCSS",
-        meta: {
-          title: "unocss",
-          svgIcon: "unocss"
-        }
-      }
-    ]
-  },
-  {
-    path: "/link",
-    component: Layout,
-    children: [
-      {
-        path: "https://juejin.cn/post/7089377403717287972",
-        component: () => {},
-        name: "Link",
-        meta: {
-          title: "外链",
-          svgIcon: "link"
-        }
-      }
-    ]
-  },
+  // {
+  //   path: "/unocss",
+  //   component: Layout,
+  //   redirect: "/unocss/index",
+  //   children: [
+  //     {
+  //       path: "index",
+  //       component: () => import("@/views/unocss/index.vue"),
+  //       name: "UnoCSS",
+  //       meta: {
+  //         title: "unocss",
+  //         svgIcon: "unocss"
+  //       }
+  //     }
+  //   ]
+  // },
+  // {
+  //   path: "/link",
+  //   component: Layout,
+  //   children: [
+  //     {
+  //       path: "https://juejin.cn/post/7089377403717287972",
+  //       component: () => {},
+  //       name: "Link",
+  //       meta: {
+  //         title: "外链",
+  //         svgIcon: "link"
+  //       }
+  //     }
+  //   ]
+  // },
   {
     path: "/table",
     component: Layout,
@@ -216,6 +216,36 @@ export const constantRoutes: RouteRecordRaw[] = [
         name: "UseFullscreenLoading",
         meta: {
           title: "useFullscreenLoading"
+        }
+      }
+    ]
+  },
+  {
+    path: "/system",
+    component: Layout,
+    redirect: "/system/static-picture",
+    name: "system",
+    meta: {
+      title: "系统管理",
+      elIcon: "Grid"
+    },
+    children: [
+      {
+        path: "static-picture",
+        component: () => import("@/views/system/static-picture/index.vue"),
+        name: "ElementPlus",
+        meta: {
+          title: "静态图片",
+          keepAlive: true
+        }
+      },
+      {
+        path: "vxe-table",
+        component: () => import("@/views/table/vxe-table/index.vue"),
+        name: "VxeTable",
+        meta: {
+          title: "Vxe Table",
+          keepAlive: true
         }
       }
     ]

@@ -45,10 +45,13 @@ const handleClickOutside = () => {
 <template>
   <div :class="classObj" class="app-wrapper">
     <div v-if="classObj.mobile && classObj.openSidebar" class="drawer-bg" @click="handleClickOutside" />
+
+    <NavigationBar />
+
     <Sidebar class="sidebar-container" />
     <div :class="{ hasTagsView: showTagsView }" class="main-container">
       <div :class="{ 'fixed-header': fixedHeader }">
-        <NavigationBar />
+        <!-- <NavigationBar /> -->
         <TagsView v-show="showTagsView" />
       </div>
       <AppMain />
@@ -99,7 +102,7 @@ const handleClickOutside = () => {
   height: 100%;
   position: fixed;
   font-size: 0px;
-  top: 0;
+  top: 50px;
   bottom: 0;
   left: 0;
   z-index: 1001;
@@ -108,7 +111,7 @@ const handleClickOutside = () => {
 
 .fixed-header {
   position: fixed;
-  top: 0;
+  top: 50px;
   right: 0;
   z-index: 9;
   width: calc(100% - var(--v3-sidebar-width));

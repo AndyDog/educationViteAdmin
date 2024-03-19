@@ -34,13 +34,14 @@ const key = computed(() => {
 
 .fixed-header + .app-main {
   padding-top: var(--v3-navigationbar-height);
-  height: 100vh;
+  height: calc(100vh - var(--v3-header-height));
+  // height: 100vh;
   overflow: auto;
 }
 
 .hasTagsView {
   .app-main {
-    min-height: calc(100vh - var(--v3-header-height));
+    // min-height: calc(100vh - var(--v3-header-height));
   }
   .fixed-header + .app-main {
     padding-top: var(--v3-header-height);

@@ -40,6 +40,10 @@ const logout = () => {
 
 <template>
   <div class="navigation-bar">
+    <div class="navigation-logo">
+      <img src="@/assets/layout/logo-text-1.png" class="sidebar-logo" />
+    </div>
+
     <Hamburger :is-active="sidebar.opened" class="hamburger" @toggle-click="toggleSidebar" />
     <Breadcrumb class="breadcrumb" />
     <div class="right-menu">
@@ -53,7 +57,7 @@ const logout = () => {
         </div>
         <template #dropdown>
           <el-dropdown-menu>
-            <a target="_blank" href="https://juejin.cn/post/7089377403717287972">
+            <!-- <a target="_blank" href="https://juejin.cn/post/7089377403717287972">
               <el-dropdown-item>中文文档</el-dropdown-item>
             </a>
             <a target="_blank" href="https://github.com/un-pany/v3-admin-vite">
@@ -61,7 +65,7 @@ const logout = () => {
             </a>
             <a target="_blank" href="https://gitee.com/un-pany/v3-admin-vite">
               <el-dropdown-item>Gitee</el-dropdown-item>
-            </a>
+            </a> -->
             <el-dropdown-item divided @click="logout">
               <span style="display: block">退出登录</span>
             </el-dropdown-item>
@@ -84,6 +88,19 @@ const logout = () => {
     float: left;
     padding: 0 15px;
     cursor: pointer;
+  }
+
+  .navigation-logo {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    float: left;
+    padding: 0 15px;
+    cursor: pointer;
+    img {
+      width: auto;
+      height: 50px;
+    }
   }
   .breadcrumb {
     float: left;
