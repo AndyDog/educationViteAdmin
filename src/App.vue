@@ -2,14 +2,14 @@
 import { h } from "vue"
 import { useTheme } from "@/hooks/useTheme"
 import { ElNotification } from "element-plus"
-import zhCn from "element-plus/lib/locale/lang/zh-cn"
-
+// import zhCn from "element-plus/lib/locale/lang/zh-cn"
+import localeZH from "element-plus/es/locale/lang/zh-cn"
 const { initTheme } = useTheme()
 
 /** 初始化主题 */
 initTheme()
 /** 将 Element Plus 的语言设置为中文 */
-const locale = zhCn
+const locale = localeZH
 </script>
 
 <template>

@@ -91,30 +91,30 @@ const xGridOpt: VxeGridProps = reactive({
     },
     {
       field: "username",
-      title: "用户名"
+      title: "图片KEY"
     },
-    {
-      field: "roles",
-      title: "角色",
-      /** 自定义列与 type: "html" 的列一起使用，会产生错误，所以采用 TSX 实现 */
-      slots: RoleColumnSolts
-    },
+    // {
+    //   field: "roles",
+    //   title: "角色",
+    //   /** 自定义列与 type: "html" 的列一起使用，会产生错误，所以采用 TSX 实现 */
+    //   slots: RoleColumnSolts
+    // },
     {
       field: "phone",
-      title: "手机号"
+      title: "图片名称"
     },
     {
       field: "email",
-      title: "邮箱"
+      title: "图片地址"
     },
-    {
-      field: "status",
-      title: "状态",
-      slots: StatusColumnSolts
-    },
+    // {
+    //   field: "status",
+    //   title: "状态",
+    //   slots: StatusColumnSolts
+    // },
     {
       field: "createTime",
-      title: "创建时间"
+      title: "更新时间"
     },
     {
       title: "操作",
@@ -206,14 +206,21 @@ const xFormOpt = reactive<VxeFormProps>({
   items: [
     {
       field: "username",
-      title: "用户名",
+      title: "图片KEY",
       itemRender: { name: "$input", props: { placeholder: "请输入" } }
     },
     {
       field: "password",
-      title: "密码",
+      title: "图片名称",
       itemRender: { name: "$input", props: { placeholder: "请输入" } }
     },
+
+    {
+      field: "password",
+      title: "图片",
+      itemRender: { name: "$input", props: { placeholder: "请输入" } }
+    },
+
     {
       align: "right",
       itemRender: {

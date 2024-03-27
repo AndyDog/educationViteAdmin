@@ -36,6 +36,8 @@ const isCollapse = computed(() => {
 <template>
   <div :class="{ 'has-logo': showSidebarLogo }">
     <!-- <SidebarLogo v-if="showSidebarLogo" :collapse="isCollapse" /> -->
+    <!-- {{ permissionStore }} -->
+
     <el-scrollbar wrap-class="scrollbar-wrapper">
       <el-menu
         :default-active="activeMenu"
