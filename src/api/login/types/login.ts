@@ -1,10 +1,10 @@
 export interface ILoginRequestData {
   /** admin 或 editor */
-  username: "admin" | "editor"
+  userName: "admin" | "editor"
   /** 密码 */
-  password: string
+  passWord: string
   /** 验证码 */
-  code: string
+  imageCode: string
 }
 
 export type LoginCodeResponseData = IApiResponseData<string>

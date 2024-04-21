@@ -3,7 +3,7 @@
     <div class="upload-item">
       <el-upload
         ref="uploadObj"
-        :action="uploadFileUrl"
+        action="/medicine/user/upLoadImage"
         list-type="picture-card"
         multiple
         :limit="limitNum"
@@ -11,7 +11,7 @@
         :file-list="formData.fileList"
         :on-error="handleError"
         :on-change="handleChange"
-        :auto-upload="false"
+        :auto-upload="true"
         :acceptType="acceptType"
       >
         <el-icon class="avatar-uploader-icon">
@@ -42,7 +42,7 @@ import { ref, reactive, watch, nextTick, onMounted } from "vue"
 import { ElMessage } from "element-plus"
 
 //const loadPath = window.serverUrl.FILE_SERVER
-const uploadFileUrl = ref("#")
+const uploadFileUrl = ref("/medicine/user/upLoadImage")
 const limitNum = ref(1) // 限制一次上传1张
 const acceptType = ref(".bmp, .gif, .jpg, .jpeg, .png")
 const uploadObj = ref(null)

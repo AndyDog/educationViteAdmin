@@ -38,12 +38,12 @@ export default (configEnv: ConfigEnv): UserConfigExport => {
       strictPort: false,
       /** 接口代理 */
       proxy: {
-        "/api/v1": {
-          target: "https://mock.mengxuegu.com/mock/63218b5fb4c53348ed2bc212/api/v1",
+        "/medicine/": {
+          target: "http://118.178.233.104:8080/medicine/",
           ws: true,
           /** 是否允许跨域 */
           changeOrigin: true,
-          rewrite: (path) => path.replace("/api/v1", "")
+          rewrite: (path) => path.replace("/medicine", "")
         }
       }
     },
