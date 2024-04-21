@@ -143,19 +143,20 @@ export const constantRoutes: RouteRecordRaw[] = [
       {
         path: "training-info",
         component: () => import("@/views/training/training-info/index.vue"),
+        // component: () => import("@/views/training/trainingcourseinfos/index.vue"),
         name: "trainingInfo",
         meta: {
           title: "培训信息",
-          keepAlive: true
+          keepAlive: false
         }
       },
       {
-        path: "trainingcourseinfos",
+        path: "training-course-infos",
         component: () => import("@/views/training/trainingcourseinfos/index.vue"),
         name: "trainingCourseInfos",
         meta: {
           title: "培训课程信息",
-          keepAlive: true
+          keepAlive: false
         }
       },
       {
@@ -164,7 +165,7 @@ export const constantRoutes: RouteRecordRaw[] = [
         name: "userTrainingInfo",
         meta: {
           title: "用户培训信息",
-          keepAlive: true
+          keepAlive: false
         }
       },
       {
@@ -173,7 +174,7 @@ export const constantRoutes: RouteRecordRaw[] = [
         name: "userScheduleInfo11",
         meta: {
           title: "用户课表信息",
-          keepAlive: true
+          keepAlive: false
         }
       },
       {
@@ -182,7 +183,7 @@ export const constantRoutes: RouteRecordRaw[] = [
         name: "TrainingPaperManagement",
         meta: {
           title: "培训试卷管理",
-          keepAlive: true
+          keepAlive: false
         }
       },
       {
@@ -191,7 +192,7 @@ export const constantRoutes: RouteRecordRaw[] = [
         name: "TrainingReleaseExam",
         meta: {
           title: "培训发布考试",
-          keepAlive: true
+          keepAlive: false
         }
       },
       {
@@ -200,7 +201,7 @@ export const constantRoutes: RouteRecordRaw[] = [
         name: "TrainingExamCorrection",
         meta: {
           title: "培训考试批改",
-          keepAlive: true
+          keepAlive: false
         }
       },
       {

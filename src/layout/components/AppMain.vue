@@ -21,6 +21,8 @@ console.log(key)
         </keep-alive>
       </transition>
     </router-view>
+    {{ key }}
+    {{ tagsViewStore.cachedViews }}
   </section>
 </template>
 
