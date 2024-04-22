@@ -27,8 +27,8 @@ export const useUserStore = defineStore("user", () => {
     return new Promise((resolve, reject) => {
       loginApi({
         username: loginData.username,
-        password: loginData.password,
-        code: loginData.code
+        passWord: loginData.password,
+        imageCode: loginData.code
       })
         .then((res) => {
           setToken(res.data.token)

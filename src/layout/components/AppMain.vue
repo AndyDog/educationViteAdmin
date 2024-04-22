@@ -9,6 +9,7 @@ const tagsViewStore = useTagsViewStore()
 const key = computed(() => {
   return route.path
 })
+console.log(key)
 </script>
 
 <template>

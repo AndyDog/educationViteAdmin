@@ -17,9 +17,9 @@ const loading = ref(false)
 const codeUrl = ref("")
 /** 登录表单数据 */
 const loginForm: ILoginRequestData = reactive({
-  username: "admin",
-  password: "12345678",
-  code: ""
+  userName: "admin",
+  passWord: "12345678",
+  imageCode: ""
 })
 /** 登录表单校验规则 */
 const loginFormRules: FormRules = {
@@ -37,9 +37,9 @@ const handleLogin = () => {
       loading.value = true
       useUserStore()
         .login({
-          username: loginForm.username,
-          password: loginForm.password,
-          code: loginForm.code
+          userName: loginForm.username,
+          passWord: loginForm.password,
+          imageCode: loginForm.code
         })
         .then(() => {
           router.push({ path: "/" })
@@ -68,7 +68,7 @@ const createCode = () => {
 }
 
 /** 初始化验证码 */
-createCode()
+// createCode()
 </script>
 
 <template>
