@@ -90,3 +90,39 @@ export function updateCourse(data: any) {
     data
   })
 }
+
+/** 培训信息-获取列表*/
+export function queryInfomationList(data: any) {
+  return request({
+    url: "/training/queryInfomationList",
+    method: "post",
+    data
+  })
+}
+
+/** 培训信息-增加*/
+export function addInfomation(data: any) {
+  return request({
+    url: "/training/addInfomation",
+    method: "post",
+    data
+  })
+}
+
+/** 培训信息-删除*/
+export function deleteInfomation(data: any) {
+  return request({
+    url: "/training/deleteInfomation",
+    method: "post",
+    data
+  })
+}
+
+/** 培训信息-修改*/
+export function updateInfomation(data: any) {
+  return request({
+    url: "/training/updateInfomation",
+    method: "post",
+    data
+  })
+}

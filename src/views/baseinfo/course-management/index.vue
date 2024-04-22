@@ -1,6 +1,14 @@
 <script lang="ts" setup>
 import { reactive, ref, watch } from "vue"
-import { createTableDataApi, deleteTableDataApi, updateTableDataApi, queryCourseListApi } from "@/api/table"
+import {
+  createTableDataApi,
+  deleteTableDataApi,
+  updateTableDataApi,
+  queryCourseListApi,
+  addCourse,
+  updateCourse,
+  deleteCourse
+} from "@/api/table"
 import { type IGetTableData } from "@/api/table/types/table"
 import { type FormInstance, type FormRules, ElMessage, ElMessageBox } from "element-plus"
 import { Search, Refresh, CirclePlus, Delete, Download, RefreshRight } from "@element-plus/icons-vue"
@@ -10,6 +18,9 @@ import Editor from "@/components/Editor.vue"
 defineOptions({
   name: "ElementPlus"
 })
+
+const VITE_BASE_API = ref(import.meta.env.VITE_BASE_API + "user/upLoadImage")
+
 // 课程管理
 const loading = ref<boolean>(false)
 const { paginationData, handleCurrentChange, handleSizeChange } = usePagination()
@@ -25,6 +36,7 @@ const formData = reactive({
   pic: "",
   content: ""
 })
+let imageUrl = ref<any>("")
 const formRules: FormRules = reactive({
   username: [{ required: true, trigger: "blur", message: "请输入用户名" }],
   password: [{ required: true, trigger: "blur", message: "请输入密码" }]
@@ -32,19 +44,37 @@ const formRules: FormRules = reactive({
 const handleCreate = () => {
   formRef.value?.validate((valid: boolean) => {
     if (valid) {
+      console.log(formData)
       if (currentUpdateId.value === undefined) {
-        createTableDataApi({
-          username: formData.username,
-          password: formData.password
+        addCourse({
+          courseClassify: formData.type, //课程分类
+          courseCode: formData.username, //课程代码
+          courseId: formData.password, //课程ID
+          courseImagePath: formData.pic, //课程图片路径
+          courseIntroduce: formData.content, //课程简介
+          courseName: formData.password, //课程名称
+          dictCode: formData.type, //分类ID
+          insertTime: "", //插入时间
+          lecturer: formData.person, //主讲老师
+          updateTime: "" //更新时间
         }).then(() => {
           ElMessage.success("新增成功")
           dialogVisible.value = false
           getTableData()
         })
       } else {
-        updateTableDataApi({
+        updateCourse({
+          courseClassify: formData.type, //课程分类
+          courseCode: formData.username, //课程代码
+          courseId: formData.password, //课程ID
+          courseImagePath: formData.pic, //课程图片路径
+          courseIntroduce: formData.content, //课程简介
+          courseName: formData.password, //课程名称
+          dictCode: formData.type, //分类ID
+          insertTime: "", //插入时间
           id: currentUpdateId.value,
-          username: formData.username
+          lecturer: formData.person, //主讲老师
+          updateTime: "" //更新时间
         }).then(() => {
           ElMessage.success("修改成功")
           dialogVisible.value = false
@@ -70,7 +100,7 @@ const handleDelete = (row: IGetTableData) => {
     cancelButtonText: "取消",
     type: "warning"
   }).then(() => {
-    deleteTableDataApi(row.id).then(() => {
+    deleteCourse(row.id).then(() => {
       ElMessage.success("删除成功")
       getTableData()
     })
@@ -134,6 +164,13 @@ const updateFiles = (list: any) => {
     formData.pic = list
   }
 }
+
+const handleAvatarSuccess = (res: any, file: any) => {
+  imageUrl.value = URL.createObjectURL(file.raw)
+  formData.pic = res.data
+  console.log(imageUrl)
+}
+
 //#endregion
 
 /** 监听分页参数的变化 */
@@ -241,11 +278,32 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
           ></el-col>
         </el-row>
 
+        <!-- <el-form-item label="课程图片:" prop="pic">
+
+          <el-input v-model="formData.pic" style="height: 0px; width: 0px"></el-input>
+          <upload-img @updateFileList="updateFiles"></upload-img>
+        </el-form-item> -->
+
         <el-form-item label="课程图片:" prop="pic">
           <!-- //pic为了验证图片是必传的 -->
-          <el-input v-model="formData.pic" style="height: 0px; width: 0px"></el-input>
-          <!-- // :filesData="item.ufjList" 如果有回显，把获取的图片对象传给图片组件 -->
-          <upload-img @updateFileList="updateFiles"></upload-img>
+          <el-input v-model="formData.pic" style="height: 0px; width: 0px; visibility: hidden"></el-input>
+          <!-- <upload-img @updateFileList="updateFiles"></upload-img> -->
+
+          <el-upload
+            class="avatar-uploader"
+            :action="VITE_BASE_API"
+            :show-file-list="false"
+            :on-success="handleAvatarSuccess"
+          >
+            <img v-if="imageUrl" :src="imageUrl" class="avatar" />
+            <!-- <i v-else class="el-icon-plus avatar-uploader-icon"></i> -->
+            <el-icon v-else class="avatar-uploader-icon">
+              <Plus />
+            </el-icon>
+            <!-- <i class="el-icon-upload"></i>
+            <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+            <div class="el-upload__tip" slot="tip">只能上传jpg/png文件，且不超过500kb</div> -->
+          </el-upload>
         </el-form-item>
 
         <el-form-item prop="content" label="课程简介">
@@ -264,6 +322,7 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
 <style lang="scss" scoped>
 .search-wrapper {
   margin-bottom: 20px;
+
   :deep(.el-card__body) {
     padding-bottom: 2px;
   }
