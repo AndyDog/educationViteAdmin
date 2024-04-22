@@ -63,3 +63,30 @@ export function queryCourseListApi(data: any) {
     data
   })
 }
+
+/** 课程管理_增加课程*/
+export function addCourse(data: any) {
+  return request({
+    url: "/base/addCourse",
+    method: "post",
+    data
+  })
+}
+
+/** 课程管理_删除课程*/
+export function deleteCourse(data: any) {
+  return request({
+    url: "/base/deleteCourse",
+    method: "post",
+    data
+  })
+}
+
+/** 课程管理_更新课程*/
+export function updateCourse(data: any) {
+  return request({
+    url: "/base/updateCourse",
+    method: "post",
+    data
+  })
+}
