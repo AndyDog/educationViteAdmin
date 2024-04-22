@@ -28,7 +28,7 @@ export function updateTableDataApi(data: any) {
   })
 }
 
-/** 查 */
+/** 查 静态图片 */
 export function getTableDataApi(params: any) {
   return request({
     url: "/user/queryImages",
@@ -37,7 +37,7 @@ export function getTableDataApi(params: any) {
   })
 }
 
-/** 上传图片 */
+/** 上传图片 静态图片 */
 export function upLoadImageApi(params: any) {
   return request({
     url: "/user/upLoadImage",
@@ -50,6 +50,15 @@ export function upLoadImageApi(params: any) {
 export function addImagesApi(data: any) {
   return request({
     url: "/user/addImages",
+    method: "post",
+    data
+  })
+}
+
+/** 课程管理_获取课程列表*/
+export function queryCourseListApi(data: any) {
+  return request({
+    url: "/base/queryCourseList",
     method: "post",
     data
   })

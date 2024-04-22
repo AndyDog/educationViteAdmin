@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { reactive, ref, watch } from "vue"
-import { createTableDataApi, deleteTableDataApi, updateTableDataApi, getTableDataApi } from "@/api/table"
+import { createTableDataApi, deleteTableDataApi, updateTableDataApi, queryCourseListApi } from "@/api/table"
 import { type IGetTableData } from "@/api/table/types/table"
 import { type FormInstance, type FormRules, ElMessage, ElMessageBox } from "element-plus"
 import { Search, Refresh, CirclePlus, Delete, Download, RefreshRight } from "@element-plus/icons-vue"
@@ -10,7 +10,7 @@ import Editor from "@/components/Editor.vue"
 defineOptions({
   name: "ElementPlus"
 })
-
+// 课程管理
 const loading = ref<boolean>(false)
 const { paginationData, handleCurrentChange, handleSizeChange } = usePagination()
 
@@ -96,11 +96,10 @@ const searchData = reactive({
 })
 const getTableData = () => {
   loading.value = true
-  getTableDataApi({
-    currentPage: paginationData.currentPage,
-    size: paginationData.pageSize,
-    username: searchData.username || undefined,
-    phone: searchData.phone || undefined
+  queryCourseListApi({
+    courseIds: [],
+    page: paginationData.currentPage,
+    size: paginationData.pageSize
   })
     .then((res) => {
       paginationData.total = res.data.total

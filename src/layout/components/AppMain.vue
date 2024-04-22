@@ -9,7 +9,7 @@ const tagsViewStore = useTagsViewStore()
 const key = computed(() => {
   return route.path
 })
-console.log(key)
+// console.log(key)
 </script>
 
 <template>
@@ -21,8 +21,6 @@ console.log(key)
         </keep-alive>
       </transition>
     </router-view>
-    {{ key }}
-    {{ tagsViewStore.cachedViews }}
   </section>
 </template>
 
