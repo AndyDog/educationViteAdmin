@@ -143,19 +143,20 @@ export const constantRoutes: RouteRecordRaw[] = [
       {
         path: "training-info",
         component: () => import("@/views/training/training-info/index.vue"),
+        // component: () => import("@/views/training/trainingcourseinfos/index.vue"),
         name: "trainingInfo",
         meta: {
           title: "培训信息",
-          keepAlive: true
+          keepAlive: false
         }
       },
       {
-        path: "trainingcourseinfos",
+        path: "training-course-infos",
         component: () => import("@/views/training/trainingcourseinfos/index.vue"),
         name: "trainingCourseInfos",
         meta: {
           title: "培训课程信息",
-          keepAlive: true
+          keepAlive: false
         }
       },
       {
@@ -164,6 +165,148 @@ export const constantRoutes: RouteRecordRaw[] = [
         name: "userTrainingInfo",
         meta: {
           title: "用户培训信息",
+          keepAlive: false
+        }
+      },
+      {
+        path: "user-Schedule-info",
+        component: () => import("@/views/training/user-Schedule-info/index.vue"),
+        name: "userScheduleInfo11",
+        meta: {
+          title: "用户课表信息",
+          keepAlive: false
+        }
+      },
+      {
+        path: "training-paper-management",
+        component: () => import("@/views/training/training-paper-management/index.vue"),
+        name: "TrainingPaperManagement",
+        meta: {
+          title: "培训试卷管理",
+          keepAlive: false
+        }
+      },
+      {
+        path: "training-release-exam",
+        component: () => import("@/views/training/training-release-exam/index.vue"),
+        name: "TrainingReleaseExam",
+        meta: {
+          title: "培训发布考试",
+          keepAlive: false
+        }
+      },
+      {
+        path: "training-exam-correction",
+        component: () => import("@/views/training/training-exam-correction/index.vue"),
+        name: "TrainingExamCorrection",
+        meta: {
+          title: "培训考试批改",
+          keepAlive: false
+        }
+      },
+      {
+        path: "training-certificate",
+        component: () => import("@/views/training/training-certificate/index.vue"),
+        name: "TrainingCertificate",
+        meta: {
+          title: "培训证书",
+          keepAlive: true
+        }
+      }
+    ]
+  },
+  {
+    path: "/usercenter",
+    component: Layout,
+    redirect: "/usercenter/userinfo",
+    name: "userCenter",
+    meta: {
+      title: "个人中心",
+      elIcon: "menu"
+    },
+    children: [
+      {
+        path: "userinfo",
+        component: () => import("@/views/usercenter/userinfo/index.vue"),
+        name: "userInfo",
+        meta: {
+          title: "个人资料",
+          keepAlive: true
+        }
+      },
+      {
+        path: "mymessage",
+        component: () => import("@/views/usercenter/myMessage/index.vue"),
+        name: "myMessage",
+        meta: {
+          title: "我的消息",
+          keepAlive: true
+        }
+      },
+      {
+        path: "personal-cloud-storage",
+        component: () => import("@/views/usercenter/PersonalCloudStorage/index.vue"),
+        name: "PersonalCloudStorage",
+        meta: {
+          title: "个人云盘",
+          keepAlive: true
+        }
+      }
+    ]
+  },
+  {
+    path: "/system",
+    component: Layout,
+    redirect: "/system/user-manage",
+    name: "system",
+    meta: {
+      title: "系统管理",
+      elIcon: "Grid"
+    },
+    children: [
+      {
+        path: "user-manage",
+        component: () => import("@/views/system/user-manage/index.vue"),
+        name: "userManage",
+        meta: {
+          title: "用户管理",
+          keepAlive: true
+        }
+      },
+      {
+        path: "role-manage",
+        component: () => import("@/views/system/public-notice/index.vue"),
+        name: "roleManage",
+        meta: {
+          title: "角色管理",
+          keepAlive: true
+        }
+      },
+
+      {
+        path: "org-manage",
+        component: () => import("@/views/system/user-manage/index.vue"),
+        name: "orgManage",
+        meta: {
+          title: "机构管理",
+          keepAlive: true
+        }
+      },
+      {
+        path: "group-manage",
+        component: () => import("@/views/system/hire-manage/index.vue"),
+        name: "groupManage",
+        meta: {
+          title: "分组管理",
+          keepAlive: true
+        }
+      },
+      {
+        path: "menu-manage",
+        component: () => import("@/views/system/hire-manage/index.vue"),
+        name: "menuManage",
+        meta: {
+          title: "菜单管理",
           keepAlive: true
         }
       },
