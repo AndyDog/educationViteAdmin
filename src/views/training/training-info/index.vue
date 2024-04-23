@@ -22,12 +22,12 @@ const VITE_BASE_API = ref(import.meta.env.VITE_BASE_API + "user/upLoadImage")
 const loading = ref<boolean>(false)
 const { paginationData, handleCurrentChange, handleSizeChange } = usePagination()
 //引入组件
-import uploadImg from "@/components/uploadImg.vue"
-import { json } from "stream/consumers"
+//import uploadImg from "@/components/uploadImg.vue"
+//import { json } from "stream/consumers"
 //#region 增
 const dialogVisible = ref<boolean>(false)
 const formRef = ref<FormInstance | null>(null)
-const formData = reactive({
+const formData = reactive<any>({
   code: "",
   name: "",
   isfree: "",
@@ -96,18 +96,6 @@ const handleDelete = (row: any) => {
 const currentUpdateId = ref<undefined | string>(undefined)
 const handleUpdate = (row: IGetTableData) => {
   currentUpdateId.value = row.id
-  // formData.imageKey = row.imageKey
-  // formData.imageValue = row.imageValue
-  // formData.imagePath = row.imagePath
-
-  // imageKey: "",
-  // imageValue: "",
-  // imagePath: "",
-  // sort: "",
-  // type: 1,
-  // userId: "",
-  // imageKeys: []
-
   dialogVisible.value = true
 }
 //#endregion
@@ -186,18 +174,6 @@ const handleAvatarSuccess1 = (res: any, file: any) => {
   formData.pic1 = res.data
   console.log(imageUrl1)
 }
-// const beforeAvatarUpload = (file: any) => {
-//   const isJPG = file.type === "image/jpeg"
-//   const isLt2M = file.size / 1024 / 1024 < 2
-
-//   if (!isJPG) {
-//     ElMessage.error("上传头像图片只能是 JPG 格式!")
-//   }
-//   if (!isLt2M) {
-//     ElMessage.error("上传头像图片大小不能超过 2MB!")
-//   }
-//   return isJPG && isLt2M
-// }
 
 //#endregion
 
@@ -221,8 +197,9 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
             <el-option label="Zone two" value="beijing" />
           </el-select>
         </el-form-item>
-        <el-form-item prop="statue" label="上架状态">
-          <el-select v-model="formData.statue" placeholder="Activity zone">
+        <el-form-item prop="statue" label="上架状态"
+          >s
+          <el-select v-model="searchData.statue" placeholder="Activity zone">
             <el-option label="Zone one" value="shanghai" />
             <el-option label="Zone two" value="beijing" />
           </el-select>
@@ -233,6 +210,7 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
         </el-form-item>
       </el-form>
     </el-card>
+
     <el-card v-loading="loading" shadow="never">
       <div class="toolbar-wrapper">
         <div>
@@ -396,7 +374,6 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
       </template>
     </el-dialog>
   </div>
-  <!-- </div> -->
 </template>
 
 <style lang="scss" scoped>
