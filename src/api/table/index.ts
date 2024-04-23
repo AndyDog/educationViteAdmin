@@ -126,3 +126,41 @@ export function updateInfomation(data: any) {
     data
   })
 }
+
+// 培训课程信息----------------------------------
+
+/** 培训课程信息-获取列表*/
+export function getTrainingCourse(data: any) {
+  return request({
+    url: "/training/getTrainingCourse",
+    method: "post",
+    data
+  })
+}
+
+/** 培训课程信息-增加*/
+export function addTrainingCourse(data: any) {
+  return request({
+    url: "/training/addTrainingCourse",
+    method: "post",
+    data
+  })
+}
+
+/** 培训课程信息-删除*/
+export function deleteTrainingCourse(data: any) {
+  return request({
+    url: "/training/deleteTrainingCourse",
+    method: "post",
+    data
+  })
+}
+
+/** 培训课程信息-修改*/
+export function updateTrainingCourse(data: any) {
+  return request({
+    url: "/training/updateTrainingCourse",
+    method: "post",
+    data
+  })
+}

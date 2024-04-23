@@ -3,7 +3,7 @@ import { type RouteRecordRaw, createRouter, createWebHashHistory, createWebHisto
 const Layout = () => import("@/layout/index.vue")
 
 /** 常驻路由 */
-export const constantRoutes: RouteRecordRaw[] = [
+export const constantRoutes = [
   {
     path: "/redirect",
     component: Layout,
@@ -42,19 +42,7 @@ export const constantRoutes: RouteRecordRaw[] = [
   {
     path: "/",
     component: Layout,
-    redirect: "/dashboard",
-    children: [
-      {
-        path: "dashboard",
-        component: () => import("@/views/dashboard/index.vue"),
-        name: "Dashboard",
-        meta: {
-          title: "首页",
-          svgIcon: "dashboard",
-          affix: true
-        }
-      }
-    ]
+    redirect: "/baseinfo/course-management"
   },
   {
     path: "/baseinfo",
