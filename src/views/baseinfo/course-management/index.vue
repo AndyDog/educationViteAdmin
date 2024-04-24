@@ -29,12 +29,16 @@ const { paginationData, handleCurrentChange, handleSizeChange } = usePagination(
 const dialogVisible = ref<boolean>(false)
 const formRef = ref<FormInstance | null>(null)
 const formData = reactive({
-  username: "",
-  password: "",
-  type: "",
-  person: "",
-  pic: "",
-  content: ""
+  courseClassify: "", //课程分类
+  courseCode: "", //课程代码
+  courseId: "", //课程ID
+  courseImagePath: "", //课程图片路径
+  courseIntroduce: "", //课程简介
+  courseName: "", //课程名称
+  dictCode: "", //分类ID
+  insertTime: "", //插入时间
+  lecturer: "", //主讲老师
+  updateTime: "" //更新时间
 })
 let imageUrl = ref<any>("")
 const formRules: FormRules = reactive({
@@ -46,36 +50,13 @@ const handleCreate = () => {
     if (valid) {
       console.log(formData)
       if (currentUpdateId.value === undefined) {
-        addCourse({
-          courseClassify: formData.type, //课程分类
-          courseCode: formData.username, //课程代码
-          courseId: formData.password, //课程ID
-          courseImagePath: formData.pic, //课程图片路径
-          courseIntroduce: formData.content, //课程简介
-          courseName: formData.password, //课程名称
-          dictCode: formData.type, //分类ID
-          insertTime: "", //插入时间
-          lecturer: formData.person, //主讲老师
-          updateTime: "" //更新时间
-        }).then(() => {
+        addCourse(formData).then(() => {
           ElMessage.success("新增成功")
           dialogVisible.value = false
           getTableData()
         })
       } else {
-        updateCourse({
-          courseClassify: formData.type, //课程分类
-          courseCode: formData.username, //课程代码
-          courseId: formData.password, //课程ID
-          courseImagePath: formData.pic, //课程图片路径
-          courseIntroduce: formData.content, //课程简介
-          courseName: formData.password, //课程名称
-          dictCode: formData.type, //分类ID
-          insertTime: "", //插入时间
-          id: currentUpdateId.value,
-          lecturer: formData.person, //主讲老师
-          updateTime: "" //更新时间
-        }).then(() => {
+        updateCourse(formData).then(() => {
           ElMessage.success("修改成功")
           dialogVisible.value = false
           getTableData()
@@ -88,8 +69,16 @@ const handleCreate = () => {
 }
 const resetForm = () => {
   currentUpdateId.value = undefined
-  formData.username = ""
-  formData.password = ""
+  formData.courseClassify = ""
+  formData.courseCode = ""
+  formData.courseId = ""
+  formData.courseImagePath = ""
+  formData.courseIntroduce = ""
+  formData.courseName = ""
+  formData.dictCode = ""
+  formData.insertTime = ""
+  formData.lecturer = ""
+  formData.updateTime = ""
 }
 //#endregion
 
@@ -110,9 +99,19 @@ const handleDelete = (row: IGetTableData) => {
 
 //#region 改
 const currentUpdateId = ref<undefined | string>(undefined)
-const handleUpdate = (row: IGetTableData) => {
+const handleUpdate = (row: any) => {
   currentUpdateId.value = row.id
-  formData.username = row.username
+  // currentUpdateId.value = undefined
+  formData.courseClassify = row?.courseClassify
+  formData.courseCode = row.courseCode
+  formData.courseId = row.courseId
+  formData.courseImagePath = row.courseImagePath
+  formData.courseIntroduce = row.courseIntroduce
+  formData.courseName = row.courseName
+  formData.dictCode = row.dictCode
+  formData.insertTime = row.insertTime
+  formData.lecturer = row.lecturer
+  formData.updateTime = row.updateTime
   dialogVisible.value = true
 }
 //#endregion
@@ -131,9 +130,9 @@ const getTableData = () => {
     page: paginationData.currentPage,
     size: paginationData.pageSize
   })
-    .then((res) => {
-      paginationData.total = res.data.total
-      tableData.value = res.data.list
+    .then((res: any) => {
+      paginationData.total = res?.datas?.length
+      tableData.value = res?.datas
     })
     .catch(() => {
       tableData.value = []
@@ -167,7 +166,7 @@ const updateFiles = (list: any) => {
 
 const handleAvatarSuccess = (res: any, file: any) => {
   imageUrl.value = URL.createObjectURL(file.raw)
-  formData.pic = res.data
+  formData.courseImagePath = res.data
   console.log(imageUrl)
 }
 
@@ -211,17 +210,16 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
       <div class="table-wrapper">
         <el-table :data="tableData">
           <el-table-column type="selection" width="50" align="center" />
-          <el-table-column prop="username" label="课程代码" align="center" />
+          <el-table-column prop="courseCode" label="课程代码" align="center" />
           <!-- <el-table-column prop="roles" label="角色" align="center">
             <template #default="scope">
               <el-tag v-if="scope.row.roles === 'admin'" effect="plain">admin</el-tag>
               <el-tag v-else type="warning" effect="plain">{{ scope.row.roles }}</el-tag>
             </template>
           </el-table-column> -->
-          <el-table-column prop="phone" label="课程名称" align="center" />
-          <el-table-column prop="email" label="课程分类" align="center" />
-
-          <el-table-column prop="createTime" label="更新时间" align="center" />
+          <el-table-column prop="courseName" label="课程名称" align="center" />
+          <el-table-column prop="courseClassify" label="课程分类" align="center" />
+          <el-table-column prop="updateTime" label="更新时间" align="center" />
           <el-table-column fixed="right" label="操作" width="150" align="center">
             <template #default="scope">
               <el-button type="primary" text bg size="small" @click="handleUpdate(scope.row)">修改</el-button>
@@ -250,45 +248,40 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
       @close="resetForm"
       width="900px"
     >
+      -->
+
       <el-form ref="formRef" :model="formData" :rules="formRules" label-width="100px" label-position="left">
         <el-row :gutter="20">
           <el-col :span="12">
             <el-form-item prop="username" label="课程代码">
-              <el-input v-model="formData.username" placeholder="请输入" /> </el-form-item
+              <el-input v-model="formData.courseCode" placeholder="请输入" /> </el-form-item
           ></el-col>
           <el-col :span="12">
-            <el-form-item prop="password" label="课程名称" v-if="currentUpdateId === undefined">
-              <el-input v-model="formData.password" placeholder="请输入" /> </el-form-item
+            <el-form-item prop="password" label="课程名称">
+              <el-input v-model="formData.courseName" placeholder="请输入" /> </el-form-item
           ></el-col>
         </el-row>
 
         <el-row :gutter="20">
           <el-col :span="12">
             <el-form-item prop="type" label="课程分类">
-              <el-select v-model="formData.type" placeholder="Activity zone">
-                <el-option label="Zone one" value="shanghai" />
-                <el-option label="Zone two" value="beijing" /> </el-select></el-form-item
+              <el-select v-model="formData.courseClassify" placeholder="课程分类">
+                <el-option label="理论知识" value="理论知识" />
+                <el-option label="技能训练" value="技能训练" /> </el-select></el-form-item
           ></el-col>
           <el-col :span="12">
-            <el-form-item prop="person" label="主讲老师" v-if="currentUpdateId === undefined">
-              <el-select v-model="formData.person" placeholder="Activity zone">
+            <el-form-item prop="person" label="主讲老师">
+              <el-select v-model="formData.lecturer" placeholder="Activity zone">
                 <el-option label="Zone one" value="shanghai" />
                 <el-option label="Zone two" value="beijing" />
               </el-select> </el-form-item
           ></el-col>
         </el-row>
 
-        <!-- <el-form-item label="课程图片:" prop="pic">
-
-          <el-input v-model="formData.pic" style="height: 0px; width: 0px"></el-input>
-          <upload-img @updateFileList="updateFiles"></upload-img>
-        </el-form-item> -->
-
         <el-form-item label="课程图片:" prop="pic">
           <!-- //pic为了验证图片是必传的 -->
-          <el-input v-model="formData.pic" style="height: 0px; width: 0px; visibility: hidden"></el-input>
+          <el-input v-model="formData.courseImagePath" style="height: 0px; width: 0px; visibility: hidden"></el-input>
           <!-- <upload-img @updateFileList="updateFiles"></upload-img> -->
-
           <el-upload
             class="avatar-uploader"
             :action="VITE_BASE_API"
@@ -307,7 +300,7 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
         </el-form-item>
 
         <el-form-item prop="content" label="课程简介">
-          <Editor v-model="formData.content"></Editor>
+          <Editor v-model="formData.courseIntroduce"></Editor>
           <!-- <el-input v-model="formData.password" placeholder="请输入" /> -->
         </el-form-item>
       </el-form>

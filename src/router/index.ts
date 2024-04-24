@@ -97,15 +97,15 @@ export const constantRoutes = [
         }
       },
 
-      // {
-      //   path: "user-manage",
-      //   component: () => import("@/views/system/user-manage/index.vue"),
-      //   name: "userManage",
-      //   meta: {
-      //     title: "用户管理",
-      //     keepAlive: true
-      //   }
-      // },
+      {
+        path: "dictionary",
+        component: () => import("@/views/system/dictionary/index.vue"),
+        name: "dictionary",
+        meta: {
+          title: "字典管理",
+          keepAlive: true
+        }
+      },
       {
         path: "hire-manage",
         component: () => import("@/views/system/hire-manage/index.vue"),

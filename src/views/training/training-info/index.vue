@@ -26,35 +26,39 @@ const { paginationData, handleCurrentChange, handleSizeChange } = usePagination(
 const dialogVisible = ref<boolean>(false)
 const formRef = ref<FormInstance | null>(null)
 const formData = reactive<any>({
-  describe: "", //简介
+  introduction: "", //简介
   date: "", //时间（数组 需要拆分成开始时间和结束时间）
   beginDate: "", //开始时间
   endDate: "", //结束时间
-  requiredTime: "", //要求学时
+  studyHours: "", //要求学时
   insertTime: "", //插入时间
   isFree: "", //是否免费
-  itemCode: "", //培训信息代码
-  itemImagePath: "", //培训图片
-  itemName: "", //培训名称
+  trainingCode: "", //培训信息代码
+  trainingId: "", //培训信息ID
+  imagePath: "", //培训图片
+  trainingName: "", //培训名称
   price: "", //培训价格
-  showImagePath: "", //展示图片
+  showImage: "", //展示图片
   status: "", //上架状态
-  imeLength: "", //学习时长
+  studyHoursLength: "", //学习时长
   updateTime: "" //更新时间
 })
 let imageUrl = ref<any>("")
 let imageUrl1 = ref<any>("")
 const formRules: FormRules = reactive({
-  itemName: [{ required: true, trigger: "blur", message: "请输入培训名称" }],
+  trainingName: [{ required: true, trigger: "blur", message: "请输入培训名称" }],
   isFree: [{ required: true, trigger: "change", message: "请选择是否免费" }],
   status: [{ required: true, trigger: "change", message: "请选择上架状态" }],
-  requiredTime: [{ required: true, trigger: "blur", message: "请选择要求学时" }],
-  imeLength: [{ required: true, trigger: "blur", message: "请选择学习时长" }]
+  studyHours: [{ required: true, trigger: "blur", message: "请选择要求学时" }],
+  studyHoursLength: [{ required: true, trigger: "blur", message: "请选择学习时长" }]
 })
 const handleCreate = () => {
   formRef.value?.validate((valid: boolean) => {
     if (valid) {
       if (currentUpdateId.value === undefined) {
+        formData.beginDate = formData.date.length > 0 && formData.date[0]
+        formData.endDate = formData.date.length > 0 && formData.date[1]
+
         addInfomation(formData).then(() => {
           ElMessage.success("新增成功")
           dialogVisible.value = false
@@ -78,20 +82,20 @@ const resetForm = () => {
   currentUpdateId.value = undefined
   // formData.code = ""
   // formData.name = ""
-  formData.describe = ""
+  formData.introduction = ""
   formData.date = ""
   formData.beginDate = ""
   formData.endDate = ""
-  formData.requiredTime = ""
+  formData.studyHours = ""
   formData.insertTime = ""
   formData.isFree = ""
-  formData.itemCode = ""
-  formData.itemImagePath = ""
-  formData.itemName = ""
+  formData.trainingCode = ""
+  formData.imagePath = ""
+  formData.trainingName = ""
   formData.price = ""
-  formData.showImagePath = ""
+  formData.showImage = ""
   formData.status = ""
-  formData.imeLength = ""
+  formData.studyHoursLength = ""
   formData.updateTime = ""
 }
 //#endregion
@@ -116,8 +120,25 @@ const handleDelete = (row: any) => {
 
 //#region 改
 const currentUpdateId = ref<undefined | string>(undefined)
-const handleUpdate = (row: IGetTableData) => {
+const handleUpdate = (row: any) => {
   currentUpdateId.value = row.id
+
+  formData.introduction = row.introduction
+  formData.date = [row.beginDate, row.endDate]
+  formData.beginDate = row.beginDate
+  formData.endDate = row.endDate
+  formData.studyHours = row.studyHours
+  formData.insertTime = row.insertTime
+  formData.isFree = row.isFree
+  formData.trainingCode = row.trainingCode
+  formData.imagePath = row.imagePath
+  formData.trainingName = row.trainingName
+  formData.price = row.price
+  formData.showImage = row.showImage
+  formData.status = row.status
+  formData.studyHoursLength = row.studyHoursLength
+  formData.updateTime = row.updateTime
+
   dialogVisible.value = true
 }
 //#endregion
@@ -126,20 +147,20 @@ const handleUpdate = (row: IGetTableData) => {
 const tableData = ref<IGetTableData[]>([])
 const searchFormRef = ref<FormInstance | null>(null)
 const searchData = reactive({
-  describe: "", //简介
+  introduction: "", //简介
   date: "", //时间（数组 需要拆分成开始时间和结束时间）
   beginDate: "", //开始时间
   endDate: "", //结束时间
-  requiredTime: "", //要求学时
+  studyHours: "", //要求学时
   insertTime: "", //插入时间
   isFree: "", //是否免费
-  itemCode: "", //培训信息代码
-  itemImagePath: "", //培训图片
-  itemName: "", //培训名称
+  trainingCode: "", //培训信息代码
+  imagePath: "", //培训图片
+  trainingName: "", //培训名称
   price: "", //培训价格
-  showImagePath: "", //展示图片
+  showImage: "", //展示图片
   status: "", //上架状态
-  imeLength: "", //学习时长
+  studyHoursLength: "", //学习时长
   updateTime: "" //更新时间
 })
 const getTableData = () => {
@@ -150,10 +171,10 @@ const getTableData = () => {
     // username: searchData.username || undefined,
     // phone: searchData.phone || undefined
   })
-    .then((res) => {
+    .then((res: any) => {
       console.log(res)
-      // paginationData.total = res.data.length
-      tableData.value = res.data
+      paginationData.total = res?.datas?.length
+      tableData.value = res?.datas
     })
     .catch(() => {
       tableData.value = []
@@ -196,12 +217,12 @@ const updateFiles = (list: any) => {
 
 const handleAvatarSuccess = (res: any, file: any) => {
   imageUrl.value = URL.createObjectURL(file.raw)
-  formData.itemImagePath = res.data
+  formData.imagePath = res.data
   console.log(imageUrl)
 }
 const handleAvatarSuccess1 = (res: any, file: any) => {
   imageUrl1.value = URL.createObjectURL(file.raw)
-  formData.showImagePath = res.data
+  formData.showImage = res.data
   console.log(imageUrl1)
 }
 
@@ -215,11 +236,11 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
   <div class="app-container">
     <el-card v-loading="loading" shadow="never" class="search-wrapper">
       <el-form ref="searchFormRef" :inline="true" :model="searchData">
-        <el-form-item prop="itemCode" label="培训代码">
-          <el-input v-model="searchData.itemCode" placeholder="请输入" />
+        <el-form-item prop="trainingCode" label="培训代码">
+          <el-input v-model="searchData.trainingCode" placeholder="请输入" />
         </el-form-item>
-        <el-form-item prop="itemName" label="培训名称">
-          <el-input v-model="searchData.itemName" placeholder="请输入" />
+        <el-form-item prop="trainingName" label="培训名称">
+          <el-input v-model="searchData.trainingName" placeholder="请输入" />
         </el-form-item>
         <el-form-item prop="isFree" label="是否免费">
           <el-select style="width: 100px" v-model="searchData.isFree" placeholder="是否免费">
@@ -258,10 +279,10 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
       <div class="table-wrapper">
         <el-table :data="tableData">
           <el-table-column type="selection" width="50" align="center" />
-          <el-table-column prop="itemCode" label="培训代码" align="center" />
-          <el-table-column prop=" itemName" label="培训名称" align="center">
+          <el-table-column prop="trainingCode" label="培训代码" align="center" />
+          <el-table-column prop="trainingName" label="培训名称" align="center">
             <template #default="scope">
-              {{ scope.row.itemName }}
+              {{ scope.row.trainingName }}
             </template>
           </el-table-column>
           <el-table-column prop="isFree" label="是否免费" align="center">
@@ -307,19 +328,19 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
       <el-form ref="formRef" :model="formData" :rules="formRules" label-width="100px" label-position="left">
         <el-row :gutter="20">
           <el-col :span="12">
-            <el-form-item prop="itemCode" label="培训代码">
-              <el-input v-model="formData.itemCode" placeholder="请输入" /> </el-form-item
+            <el-form-item prop="trainingCode" label="培训代码">
+              <el-input v-model="formData.trainingCode" placeholder="请输入" /> </el-form-item
           ></el-col>
           <el-col :span="12">
-            <el-form-item prop="itemName" label="培训名称" v-if="currentUpdateId === undefined">
-              <el-input v-model="formData.itemName" placeholder="请输入" /> </el-form-item
+            <el-form-item prop="trainingName" label="培训名称" v-if="currentUpdateId === undefined">
+              <el-input v-model="formData.trainingName" placeholder="请输入" /> </el-form-item
           ></el-col>
         </el-row>
         <el-row :gutter="20">
           <el-col :span="12">
             <el-form-item label="培训图片:" prop="pic">
               <!-- //pic为了验证图片是必传的 -->
-              <el-input v-model="formData.itemImagePath" style="height: 0px; width: 0px; visibility: hidden"></el-input>
+              <el-input v-model="formData.imagePath" style="height: 0px; width: 0px; visibility: hidden"></el-input>
               <!-- // :filesData="item.ufjList" 如果有回显，把获取的图片对象传给图片组件 -->
               <!-- <upload-img @updateFileList="updateFiles"></upload-img> -->
               <el-upload
@@ -342,7 +363,7 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
           <el-col :span="12">
             <el-form-item label="展示图片:" prop="pic1">
               <!-- //pic为了验证图片是必传的 -->
-              <el-input v-model="formData.showImagePath" style="height: 0px; width: 0px; visibility: hidden"></el-input>
+              <el-input v-model="formData.showImage" style="height: 0px; width: 0px; visibility: hidden"></el-input>
               <!-- // :filesData="item.ufjList" 如果有回显，把获取的图片对象传给图片组件 -->
               <!-- <upload-img @updateFileList="updateFiles"></upload-img> -->
 
@@ -368,13 +389,13 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
           <el-col :span="12">
             <el-form-item prop="isFree" label="是否免费">
               <el-radio-group v-model="formData.isFree">
-                <el-radio value="true">是</el-radio>
-                <el-radio value="false">否</el-radio>
+                <el-radio value="1">是</el-radio>
+                <el-radio value="2">否</el-radio>
               </el-radio-group>
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item prop="date" label="培训时间" v-if="currentUpdateId === undefined">
+            <el-form-item prop="date" label="培训时间">
               <el-date-picker
                 v-model="formData.date"
                 type="daterange"
@@ -389,22 +410,22 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
           <el-col :span="12">
             <el-form-item prop="status" label="上架状态">
               <el-radio-group v-model="formData.status">
-                <el-radio value="true">上架</el-radio>
-                <el-radio value="false">下架</el-radio>
+                <el-radio value="1">上架</el-radio>
+                <el-radio value="2">下架</el-radio>
               </el-radio-group>
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item prop="requiredTime" label="要求学时" v-if="currentUpdateId === undefined">
-              <el-input-number v-model="formData.requiredTime" :min="1" :max="1000" label="要求学时"></el-input-number>
+            <el-form-item prop="studyHours" label="要求学时">
+              <el-input-number v-model="formData.studyHours" :min="1" :max="1000" label="要求学时"></el-input-number>
             </el-form-item>
           </el-col>
         </el-row>
-        <el-form-item prop="imeLength" label="学时长度(秒):">
-          <el-input-number v-model="formData.imeLength" :min="1" :max="1000" label="学时长度"></el-input-number>
+        <el-form-item prop="studyHoursLength" label="学时长度(秒):">
+          <el-input-number v-model="formData.studyHoursLength" :min="1" :max="1000" label="学时长度"></el-input-number>
         </el-form-item>
-        <el-form-item prop="describe" label="培训简介">
-          <Editor v-model="formData.describe"></Editor>
+        <el-form-item prop="introduction" label="培训简介">
+          <Editor v-model="formData.introduction"></Editor>
           <!-- <el-input v-model="formData.password" placeholder="请输入" /> -->
         </el-form-item>
       </el-form>

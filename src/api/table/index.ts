@@ -164,3 +164,41 @@ export function updateTrainingCourse(data: any) {
     data
   })
 }
+
+// -----------------字典
+
+/** 查询字典列表*/
+export function queryaDictionariesLike(data: any) {
+  return request({
+    url: "/platform/queryaDictionariesLike",
+    method: "post",
+    data
+  })
+}
+
+/** 修改字典列表*/
+export function updataDictionaries(data: any) {
+  return request({
+    url: "/platform/updataDictionaries",
+    method: "post",
+    data
+  })
+}
+
+/** 删除字典列表*/
+export function deleteDictionaries(data: any) {
+  return request({
+    url: "/platform/deleteDictionaries",
+    method: "post",
+    data
+  })
+}
+
+/** 增加字典管理列表*/
+export function addDictionaries(data: any) {
+  return request({
+    url: "/platform/addDictionaries",
+    method: "post",
+    data
+  })
+}
