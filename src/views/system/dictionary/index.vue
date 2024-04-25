@@ -99,7 +99,6 @@ const resetForm = () => {
   formData.updateTime = ""
 }
 //#endregion
-
 //#region 删
 const handleDelete = (row: any) => {
   ElMessageBox.confirm(`正在删除图片：${row.imageValue}，确认删除？`, "提示", {
@@ -237,18 +236,22 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
     <el-row :gutter="20">
       <el-col :span="8">
         <div>
-          <el-card v-loading="loading" shadow="never" class="search-wrapper">
-            <el-form ref="searchFormRef" :inline="true" :model="searchData">
-              <el-form-item prop="trainingCode" label="请输入关键词">
-                <el-input v-model="searchData.trainingCode" placeholder="请输入" />
-              </el-form-item>
-              <el-form-item>
-                <el-button type="primary" :icon="Search" @click="handleSearch">查询</el-button>
-              </el-form-item>
-            </el-form>
-          </el-card>
+          <el-card v-loading="loading" shadow="never" class="search-wrapper"> </el-card>
 
           <el-card v-loading="loading" shadow="never">
+            <el-form ref="searchFormRef" :inline="true" :model="searchData">
+              <el-form-item prop="trainingCode">
+                <div style="display: flex">
+                  <el-input v-model="searchData.trainingCode" placeholder="请输入关键词" />
+                  <el-button style="margin-left: 10px" type="primary" :icon="Search" @click="handleSearch"
+                    >查询</el-button
+                  >
+                </div>
+              </el-form-item>
+              <!-- <el-form-item>
+                <el-button type="primary" :icon="Search" @click="handleSearch">查询</el-button>
+              </el-form-item> -->
+            </el-form>
             <div class="toolbar-wrapper">
               <div>
                 <el-button type="primary" :icon="CirclePlus" @click="dialogVisible = true">添加</el-button>
