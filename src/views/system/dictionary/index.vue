@@ -273,6 +273,7 @@ const getTableDataDetail = () => {
       console.log(res)
       paginationData1.total = res?.datas?.length
       tableDataDetail.value = res?.datas
+      formDataDetail.parentId = res?.datas?.[0]?.parentId
     })
     .catch(() => {
       tableDataDetail.value = []
@@ -442,22 +443,22 @@ watch([() => paginationData1.currentPage, () => paginationData1.pageSize], getTa
                 <el-table-column prop="parentName" label="上级字典名称" align="center" />
                 <el-table-column prop="dictName" label="字典项名称" align="center">
                   <template #default="scope">
-                    {{ scope.row.trainingName }}
+                    {{ scope.row.dictName }}
                   </template>
                 </el-table-column>
                 <el-table-column prop="dictCode" label="字典项值" align="center">
                   <template #default="scope">
-                    {{ scope.row.trainingName }}
+                    {{ scope.row.dictCode }}
                   </template>
                 </el-table-column>
                 <el-table-column prop="dicNumber" label="排序号" align="center">
                   <template #default="scope">
-                    {{ scope.row.trainingName }}
+                    {{ scope.row.dicNumber }}
                   </template>
                 </el-table-column>
                 <el-table-column prop="insertTime" label="创建时间" align="center">
                   <template #default="scope">
-                    {{ scope.row.trainingName }}
+                    {{ scope.row.insertTime }}
                   </template>
                 </el-table-column>
                 <el-table-column fixed="right" label="操作" width="150" align="center">
