@@ -248,8 +248,6 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
       @close="resetForm"
       width="900px"
     >
-      -->
-
       <el-form ref="formRef" :model="formData" :rules="formRules" label-width="100px" label-position="left">
         <el-row :gutter="20">
           <el-col :span="12">

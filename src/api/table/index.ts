@@ -202,3 +202,41 @@ export function addDictionaries(data: any) {
     data
   })
 }
+
+// 查询字典详情
+
+/** 查询字典列表详情*/
+export function queryDictionariesDetailLike(data: any) {
+  return request({
+    url: "/platform/queryDictionariesDetailLike",
+    method: "post",
+    data
+  })
+}
+
+/** 修改字典列表详情*/
+export function updateDictionariesDetail(data: any) {
+  return request({
+    url: "/platform/updateDictionariesDetail",
+    method: "post",
+    data
+  })
+}
+
+/** 删除字典列表详情*/
+export function deleteDictionariesDetail(data: any) {
+  return request({
+    url: "/platform/deleteDictionariesDetail",
+    method: "post",
+    data
+  })
+}
+
+/** 增加字典管理详情*/
+export function addDictionaiesDetail(data: any) {
+  return request({
+    url: "/platform/addDictionaiesDetail",
+    method: "post",
+    data
+  })
+}
