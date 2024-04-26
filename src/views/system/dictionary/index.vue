@@ -107,7 +107,16 @@ const handleCreateDetail = () => {
   formRefDetail.value?.validate((valid: boolean) => {
     if (valid) {
       if (currentUpdateIdDetail.value === undefined) {
-        addDictionaiesDetail(formDataDetail).then(() => {
+        // let formDatatemp = JSON.parse(JSON.stringify(formData))
+        let param = {
+          dicNumber: formDataDetail.dicNumber,
+          dictCode: formDataDetail.dictCode,
+          // "dictId": formDataDetail.dictCode,
+          dictName: formDataDetail.dictName,
+          dictRemark: formDataDetail.dictRemark,
+          parentId: currentRow.value.dictId
+        }
+        addDictionaiesDetail(param).then(() => {
           ElMessage.success("新增成功")
           dialogVisibleDetail.value = false
           getTableDataDetail()
@@ -143,14 +152,13 @@ const resetFormDetail = () => {
   currentUpdateIdDetail.value = undefined
   // formData.code = ""
   // formData.name = ""
-
-  formData.dicNumber = ""
-  formData.dictCode = ""
-  formData.dictId = ""
-  formData.dictName = ""
-  formData.dictRemark = ""
-  formData.insertTime = ""
-  formData.updateTime = ""
+  formDataDetail.dicNumber = ""
+  formDataDetail.dictCode = ""
+  formDataDetail.dictId = ""
+  formDataDetail.dictName = ""
+  formDataDetail.dictRemark = ""
+  formDataDetail.insertTime = ""
+  formDataDetail.updateTime = ""
 }
 
 //#endregion
@@ -265,7 +273,9 @@ const getTableDataDetail = () => {
   queryDictionariesDetailLike({
     currentPage: paginationData1.currentPage,
     size: paginationData1.pageSize,
-    ...currentRow.value
+    parentId: currentRow.value.dictId,
+    type: 1
+    // ...currentRow.value
     // username: searchData.username || undefined,
     // phone: searchData.phone || undefined
   })

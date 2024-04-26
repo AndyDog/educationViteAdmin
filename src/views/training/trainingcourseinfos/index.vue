@@ -1,10 +1,19 @@
 <script lang="ts" setup>
-import { reactive, ref, watch } from "vue"
-import { getTrainingCourse, addTrainingCourse, deleteTrainingCourse, updateTrainingCourse } from "@/api/table"
+import { onMounted, reactive, ref, watch } from "vue"
+import {
+  getTrainingCourse,
+  addTrainingCourse,
+  deleteTrainingCourse,
+  updateTrainingCourse,
+  queryInfomationList,
+  queryDictionariesDetailLike
+} from "@/api/table"
 import { type IGetTableData } from "@/api/table/types/table"
 import { type FormInstance, type FormRules, ElMessage, ElMessageBox } from "element-plus"
 import { Search, Refresh, CirclePlus, Delete, Download, RefreshRight } from "@element-plus/icons-vue"
 import { usePagination } from "@/hooks/usePagination"
+import SelectTable from "@/components/SelectTable.vue"
+
 //培训课程信息
 defineOptions({
   name: "ElementPlus"
@@ -39,28 +48,9 @@ const formRules: FormRules = reactive({
   examRatio: [{ required: true, trigger: "blur", message: "" }]
 })
 
-const options = reactive([
-  {
-    value: "选项1",
-    label: "黄金糕"
-  },
-  {
-    value: "选项2",
-    label: "双皮奶"
-  },
-  {
-    value: "选项3",
-    label: "蚵仔煎"
-  },
-  {
-    value: "选项4",
-    label: "龙须面"
-  },
-  {
-    value: "选项5",
-    label: "北京烤鸭"
-  }
-])
+let optionstraining = ref([])
+
+let optionsType = ref([])
 
 const handleCreate = () => {
   formRef.value?.validate((valid: boolean) => {
@@ -133,7 +123,7 @@ const handleUpdate = (row: IGetTableData) => {
 const tableData = ref<IGetTableData[]>([])
 const searchFormRef = ref<FormInstance | null>(null)
 const searchData = reactive({
-  courseId: "", //课程id
+  trainingId: "", //课程id
   dictCode: "", //分类id
   examRatio: "", //考试成绩占比
   insertTime: "", //插入时间
@@ -149,13 +139,12 @@ const getTableData = () => {
   loading.value = true
   getTrainingCourse({
     currentPage: paginationData.currentPage,
-    size: paginationData.pageSize,
-    username: searchData.username || undefined,
-    phone: searchData.phone || undefined
+    size: paginationData.pageSize
   })
-    .then((res) => {
-      paginationData.total = res.data.total
-      tableData.value = res.data.list
+    .then((res: any) => {
+      paginationData.total = res?.datas?.length
+      console.log(res)
+      tableData.value = res?.datas
     })
     .catch(() => {
       tableData.value = []
@@ -180,6 +169,45 @@ const resetSearch = () => {
 const handleRefresh = () => {
   getTableData()
 }
+
+// 获取培训信息下拉列表
+const getqueryInfomationList = () => {
+  // loading.value = true
+  queryInfomationList({
+    currentPage: 1,
+    size: 99999
+  }).then((res: any) => {
+    console.log(res)
+    optionstraining.value = res?.datas
+    console.log(optionstraining)
+  })
+}
+
+const getTableDataDetail = () => {
+  queryDictionariesDetailLike({
+    currentPage: 1,
+    size: 100000,
+    parentCode: "course_classification",
+    type: 1
+    // username: searchData.username || undefined,
+    // phone: searchData.phone || undefined
+  })
+    .then((res: any) => {
+      console.log(res)
+      optionsType.value = res?.datas
+    })
+    .catch(() => {
+      optionsType.value = []
+    })
+}
+
+onMounted(() => {
+  // 初始化执行的事件
+  getqueryInfomationList()
+  getTableDataDetail()
+  // 例如，可以在这里发起API请求或者进行其他初始化工作
+})
+
 //#endregion
 
 /** 监听分页参数的变化 */
@@ -191,14 +219,39 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
     <el-card v-loading="loading" shadow="never" class="search-wrapper">
       <el-form ref="searchFormRef" :inline="true" :model="searchData">
         <el-form-item prop="username" label="培训">
-          <el-select style="width: 150px" v-model="searchData.itemId" placeholder="请选择">
-            <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value"> </el-option>
+          <el-select style="width: 150px" v-model="searchData.trainingId" placeholder="请选择">
+            <div class="customselect">
+              <el-row :gutter="20">
+                <el-col :span="12"> <span>培训代码</span></el-col>
+                <el-col :span="12"> <span>培训名称</span></el-col>
+              </el-row>
+            </div>
+            <el-option
+              v-for="item in optionstraining"
+              :key="item.trainingCode"
+              :label="item.trainingName"
+              :value="item.trainingCode"
+            >
+              <el-row :gutter="20">
+                <el-col :span="12">
+                  <span>{{ item.trainingCode }}</span></el-col
+                >
+                <el-col :span="12">
+                  <span> {{ item.trainingName }}</span></el-col
+                >
+              </el-row>
+            </el-option>
           </el-select>
+
+          <!-- <SelectTable v-model:data="searchData.trainingId" :fields="fields" :tableData="optionstraining" :label="label"
+            :objKey="objKey" :border="true"></SelectTable> -->
         </el-form-item>
 
         <el-form-item prop="phone" label="分类">
+          <!-- {{ optionsType }} -->
           <el-select style="width: 150px" v-model="searchData.dictCode" placeholder="请选择">
-            <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value"> </el-option>
+            <el-option v-for="item in optionsType" :key="item.value" :label="item.label" :value="item.value">
+            </el-option>
           </el-select>
         </el-form-item>
 
@@ -231,17 +284,21 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
       <div class="table-wrapper">
         <el-table :data="tableData">
           <el-table-column type="selection" width="50" align="center" />
-          <el-table-column prop="itemId" label="培训" align="center" />
+          <el-table-column prop="trainingName" label="培训" align="center" />
 
-          <el-table-column prop=" courseId" label="课程" align="center" />
-          <el-table-column prop="dictCode" label="分类" align="center" />
+          <el-table-column prop="courseName" label="课程" align="center" />
+          <el-table-column prop="dictName" label="分类" align="center" />
           <!-- <el-table-column prop="status" label="状态" align="center">
             <template #default="scope">
               <el-tag v-if="scope.row.status" type="success" effect="plain">启用</el-tag>
               <el-tag v-else type="danger" effect="plain">禁用</el-tag>
             </template>
           </el-table-column> -->
-          <el-table-column prop="manager" label="负责人" align="center" />
+          <el-table-column prop="manager" label="负责人" align="center">
+            <template #default="scope">
+              {{ scope.row.manager || "--" }}
+            </template>
+          </el-table-column>
           <el-table-column fixed="right" label="操作" width="150" align="center">
             <template #default="scope">
               <el-button type="primary" text bg size="small" @click="handleUpdate(scope.row)">修改</el-button>
@@ -330,6 +387,7 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
 <style lang="scss" scoped>
 .search-wrapper {
   margin-bottom: 20px;
+
   :deep(.el-card__body) {
     padding-bottom: 2px;
   }
@@ -348,5 +406,20 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
 .pager-wrapper {
   display: flex;
   justify-content: flex-end;
+}
+
+.customselect {
+  box-sizing: border-box;
+  color: var(--el-text-color-regular);
+  cursor: pointer;
+  font-size: var(--el-font-size-base);
+  height: 34px;
+  line-height: 34px;
+  overflow: hidden;
+  padding: 0 32px 0 20px;
+  position: relative;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 600;
 }
 </style>
