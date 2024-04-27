@@ -251,24 +251,24 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
       <el-form ref="formRef" :model="formData" :rules="formRules" label-width="100px" label-position="left">
         <el-row :gutter="20">
           <el-col :span="12">
-            <el-form-item prop="username" label="课程代码">
+            <el-form-item prop="courseCode" label="课程代码">
               <el-input v-model="formData.courseCode" placeholder="请输入" /> </el-form-item
           ></el-col>
           <el-col :span="12">
-            <el-form-item prop="password" label="课程名称">
+            <el-form-item prop="courseName" label="课程名称">
               <el-input v-model="formData.courseName" placeholder="请输入" /> </el-form-item
           ></el-col>
         </el-row>
 
         <el-row :gutter="20">
           <el-col :span="12">
-            <el-form-item prop="type" label="课程分类">
+            <el-form-item prop="courseClassify" label="课程分类">
               <el-select v-model="formData.courseClassify" placeholder="课程分类">
                 <el-option label="理论知识" value="理论知识" />
                 <el-option label="技能训练" value="技能训练" /> </el-select></el-form-item
           ></el-col>
           <el-col :span="12">
-            <el-form-item prop="person" label="主讲老师">
+            <el-form-item prop="lecturer" label="主讲老师">
               <el-select v-model="formData.lecturer" placeholder="Activity zone">
                 <el-option label="Zone one" value="shanghai" />
                 <el-option label="Zone two" value="beijing" />
@@ -297,7 +297,7 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
           </el-upload>
         </el-form-item>
 
-        <el-form-item prop="content" label="课程简介">
+        <el-form-item prop="courseIntroduce" label="课程简介">
           <Editor v-model="formData.courseIntroduce"></Editor>
           <!-- <el-input v-model="formData.password" placeholder="请输入" /> -->
         </el-form-item>

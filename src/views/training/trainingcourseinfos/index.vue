@@ -6,7 +6,8 @@ import {
   deleteTrainingCourse,
   updateTrainingCourse,
   queryInfomationList,
-  queryDictionariesDetailLike
+  queryDictionariesDetailLike,
+  queryCourseListApi
 } from "@/api/table"
 import { type IGetTableData } from "@/api/table/types/table"
 import { type FormInstance, type FormRules, ElMessage, ElMessageBox } from "element-plus"
@@ -27,20 +28,21 @@ const dialogVisible = ref<boolean>(false)
 const formRef = ref<FormInstance | null>(null)
 const formData = reactive({
   courseId: "", //课程id
-  dictCode: "", //分类id
+  dictId: "", //分类id
   examRatio: "", //考试成绩占比
   insertTime: "", //插入时间
   isDrag: "", //允许拖动,1-是,2-否
   isMajor: "", //是否必修,1-是,2-否,
   itemId: "", //培训信息ID
   manager: "", //负责人
+  trainingId: "", //培训信息ID
   scoreRatio: "", //学习成绩占比
   trainingCourseId: "", //培训课程信息ID
   updateTime: "" //更新时间
 })
 const formRules: FormRules = reactive({
-  itemId: [{ required: true, trigger: "blur", message: "" }],
-  dictCode: [{ required: true, trigger: "blur", message: "" }],
+  courseId: [{ required: true, trigger: "blur", message: "" }],
+  dictId: [{ required: true, trigger: "blur", message: "" }],
   courseId: [{ required: true, trigger: "blur", message: "" }],
   isDrag: [{ required: true, trigger: "blur", message: "" }],
   isMajor: [{ required: true, trigger: "blur", message: "" }],
@@ -52,13 +54,22 @@ let optionstraining = ref([])
 
 let optionsType = ref([])
 
+let optionscourseType = ref([])
+
 const handleCreate = () => {
   formRef.value?.validate((valid: boolean) => {
     if (valid) {
       if (currentUpdateId.value === undefined) {
         addTrainingCourse({
-          username: formData.username,
-          password: formData.password
+          courseId: formData.courseId,
+          dictId: formData.dictId,
+          examRatio: formData.examRatio,
+          isDrag: formData.isDrag,
+          isMajor: formData.isMajor,
+          manager: formData.manager,
+          scoreRatio: formData.scoreRatio,
+          // "trainingCourseId": "",
+          trainingId: formData.trainingId
         }).then(() => {
           ElMessage.success("新增成功")
           dialogVisible.value = false
@@ -82,7 +93,7 @@ const handleCreate = () => {
 const resetForm = () => {
   currentUpdateId.value = undefined
   formData.courseId = ""
-  formData.dictCode = ""
+  formData.dictId = ""
   formData.examRatio = ""
   formData.insertTime = ""
   formData.isDrag = ""
@@ -124,7 +135,7 @@ const tableData = ref<IGetTableData[]>([])
 const searchFormRef = ref<FormInstance | null>(null)
 const searchData = reactive({
   trainingId: "", //课程id
-  dictCode: "", //分类id
+  dictId: "", //分类id
   examRatio: "", //考试成绩占比
   insertTime: "", //插入时间
   isDrag: "", //允许拖动,1-是,2-否
@@ -201,10 +212,27 @@ const getTableDataDetail = () => {
     })
 }
 
+const getqueryCourseListApi = () => {
+  queryCourseListApi({
+    currentPage: 1,
+    size: 99999
+  })
+    .then((res: any) => {
+      optionscourseType.value = res?.datas
+    })
+    .catch(() => {
+      tableData.value = []
+    })
+    .finally(() => {
+      loading.value = false
+    })
+}
+
 onMounted(() => {
   // 初始化执行的事件
   getqueryInfomationList()
   getTableDataDetail()
+  getqueryCourseListApi()
   // 例如，可以在这里发起API请求或者进行其他初始化工作
 })
 
@@ -218,7 +246,7 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
   <div class="app-container">
     <el-card v-loading="loading" shadow="never" class="search-wrapper">
       <el-form ref="searchFormRef" :inline="true" :model="searchData">
-        <el-form-item prop="username" label="培训">
+        <el-form-item prop="trainingId" label="培训">
           <el-select style="width: 150px" v-model="searchData.trainingId" placeholder="请选择">
             <div class="customselect">
               <el-row :gutter="20">
@@ -246,18 +274,41 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
           <!-- <SelectTable v-model:data="searchData.trainingId" :fields="fields" :tableData="optionstraining" :label="label"
             :objKey="objKey" :border="true"></SelectTable> -->
         </el-form-item>
-
-        <el-form-item prop="phone" label="分类">
+        <el-form-item prop="dictId" label="分类">
           <!-- {{ optionsType }} -->
-          <el-select style="width: 150px" v-model="searchData.dictCode" placeholder="请选择">
-            <el-option v-for="item in optionsType" :key="item.value" :label="item.label" :value="item.value">
+          <el-select style="width: 150px" v-model="searchData.dictId" placeholder="请选择">
+            <el-option v-for="item in optionsType" :key="item.dictCode" :label="item.dictName" :value="item.dictCode">
             </el-option>
           </el-select>
         </el-form-item>
-
-        <el-form-item prop="phone" label="课程">
+        <el-form-item prop="courseId" label="课程">
           <el-select style="width: 150px" v-model="searchData.courseId" placeholder="请选择">
-            <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value"> </el-option>
+            <!-- <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value"> </el-option> -->
+            <div class="customselect">
+              <el-row :gutter="20">
+                <el-col :span="8"> <span>课程代码</span></el-col>
+                <el-col :span="8"> <span>课程名称</span></el-col>
+                <el-col :span="8"> <span>课程分类</span></el-col>
+              </el-row>
+            </div>
+            <el-option
+              v-for="item in optionscourseType"
+              :key="item.courseCode"
+              :label="item.courseName"
+              :value="item.courseCode"
+            >
+              <el-row :gutter="20">
+                <el-col :span="8">
+                  <span>{{ item.courseCode }}</span></el-col
+                >
+                <el-col :span="8">
+                  <span> {{ item.courseName }}</span></el-col
+                >
+                <el-col :span="8">
+                  <span> {{ item.courseClassify }}</span></el-col
+                >
+              </el-row>
+            </el-option>
           </el-select>
         </el-form-item>
         <el-form-item>
@@ -328,23 +379,68 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
       width="600px"
     >
       <el-form ref="formRef" :model="formData" :rules="formRules" label-width="140px" label-position="left">
-        <el-form-item prop="itemId" label="培训">
-          <el-select v-model="formData.itemId" placeholder="Activity zone">
-            <el-option label="Zone one" value="shanghai" />
-            <el-option label="Zone two" value="beijing" />
+        <el-form-item prop="username" label="培训">
+          <el-select v-model="formData.trainingId" placeholder="请选择">
+            <div class="customselect">
+              <el-row :gutter="20">
+                <el-col :span="12"> <span>培训代码</span></el-col>
+                <el-col :span="12"> <span>培训名称</span></el-col>
+              </el-row>
+            </div>
+            <el-option
+              v-for="item in optionstraining"
+              :key="item.trainingCode"
+              :label="item.trainingName"
+              :value="item.trainingCode"
+            >
+              <el-row :gutter="20">
+                <el-col :span="12">
+                  <span>{{ item.trainingCode }}</span></el-col
+                >
+                <el-col :span="12">
+                  <span> {{ item.trainingName }}</span></el-col
+                >
+              </el-row>
+            </el-option>
+          </el-select>
+          <!-- <SelectTable v-model:data="searchData.trainingId" :fields="fields" :tableData="optionstraining" :label="label"
+            :objKey="objKey" :border="true"></SelectTable> -->
+        </el-form-item>
+        <el-form-item prop="dictId" label="分类">
+          <!-- {{ optionsType }} -->
+          <el-select v-model="formData.dictId" placeholder="请选择">
+            <el-option v-for="item in optionsType" :key="item.dictCode" :label="item.dictName" :value="item.dictCode">
+            </el-option>
           </el-select>
         </el-form-item>
-        <el-form-item prop="dictCode" label="分类">
-          <el-select v-model="formData.dictCode" placeholder="Activity zone">
-            <el-option label="Zone one" value="shanghai" />
-            <el-option label="Zone two" value="beijing" />
-          </el-select>
-        </el-form-item>
-
         <el-form-item prop="courseId" label="课程">
-          <el-select v-model="formData.courseId" placeholder="Activity zone">
-            <el-option label="Zone one" value="shanghai" />
-            <el-option label="Zone two" value="beijing" />
+          <el-select v-model="formData.courseId" placeholder="请选择">
+            <!-- <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value"> </el-option> -->
+            <div class="customselect">
+              <el-row :gutter="20">
+                <el-col :span="8"> <span>课程代码</span></el-col>
+                <el-col :span="8"> <span>课程名称</span></el-col>
+                <el-col :span="8"> <span>课程分类</span></el-col>
+              </el-row>
+            </div>
+            <el-option
+              v-for="item in optionscourseType"
+              :key="item.courseCode"
+              :label="item.courseName"
+              :value="item.courseCode"
+            >
+              <el-row :gutter="20">
+                <el-col :span="8">
+                  <span>{{ item.courseCode }}</span></el-col
+                >
+                <el-col :span="8">
+                  <span> {{ item.courseName }}</span></el-col
+                >
+                <el-col :span="8">
+                  <span> {{ item.courseClassify }}</span></el-col
+                >
+              </el-row>
+            </el-option>
           </el-select>
         </el-form-item>
 

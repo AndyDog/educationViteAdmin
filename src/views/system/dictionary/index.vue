@@ -164,7 +164,7 @@ const resetFormDetail = () => {
 //#endregion
 //#region 删
 const handleDelete = (row: any) => {
-  ElMessageBox.confirm(`正在删除图片：${row.imageValue}，确认删除？`, "提示", {
+  ElMessageBox.confirm(`正在删除：${row.imageValue}，确认删除？`, "提示", {
     confirmButtonText: "确定",
     cancelButtonText: "取消",
     type: "warning"
@@ -180,14 +180,28 @@ const handleDelete = (row: any) => {
 }
 
 const handleDeleteDetail = (row: any) => {
-  ElMessageBox.confirm(`正在删除图片：${row.imageValue}，确认删除？`, "提示", {
+  ElMessageBox.confirm(`正在删除：${row.dictName}，确认删除？`, "提示", {
     confirmButtonText: "确定",
     cancelButtonText: "取消",
     type: "warning"
   }).then(() => {
     let obj = {}
-    // obj.imageKeys = [row.imageKey]
-    // obj.type = 2
+    obj.dictCode = row.dictCode
+    obj.dictId = row.dictId
+    obj.dictIds = [row.dictId]
+    obj.parentId = [row.parentId]
+    obj.type = 0
+
+    // {
+    // 	"dictCode": "",
+    // 	"dictId": "",
+    // 	"dictIds": [],
+    // 	"keyWord": "",
+    // 	"page": 0,
+    // 	"parentId": "",
+    // 	"size": 0,
+    // 	"type": 0
+    // }
     deleteDictionariesDetail(obj).then(() => {
       ElMessage.success("删除成功")
       getTableData()
