@@ -186,11 +186,11 @@ const handleDeleteDetail = (row: any) => {
     type: "warning"
   }).then(() => {
     let obj = {}
-    obj.dictCode = row.dictCode
-    obj.dictId = row.dictId
+    // obj.dictCode = row.dictCode
+    // obj.dictId = row.dictId
     obj.dictIds = [row.dictId]
-    obj.parentId = [row.parentId]
-    obj.type = 0
+    // obj.parentId = [row.parentId]
+    // obj.type = 0
 
     // {
     // 	"dictCode": "",
@@ -204,7 +204,7 @@ const handleDeleteDetail = (row: any) => {
     // }
     deleteDictionariesDetail(obj).then(() => {
       ElMessage.success("删除成功")
-      getTableData()
+      getTableDataDetail()
     })
   })
 }
@@ -287,7 +287,7 @@ const getTableDataDetail = () => {
   queryDictionariesDetailLike({
     currentPage: paginationData1.currentPage,
     size: paginationData1.pageSize,
-    parentId: currentRow.value.dictId,
+    parentCode: currentRow.value.dictCode,
     type: 1
     // ...currentRow.value
     // username: searchData.username || undefined,
@@ -297,7 +297,7 @@ const getTableDataDetail = () => {
       console.log(res)
       paginationData1.total = res?.datas?.length
       tableDataDetail.value = res?.datas
-      formDataDetail.parentId = res?.datas?.[0]?.parentId
+      formDataDetail.parentCode = res?.datas?.[0]?.parentId
     })
     .catch(() => {
       tableDataDetail.value = []

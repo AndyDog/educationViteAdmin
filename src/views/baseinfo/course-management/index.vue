@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { reactive, ref, watch } from "vue"
+import { onMounted, reactive, ref, watch } from "vue"
 import {
   createTableDataApi,
   deleteTableDataApi,
@@ -7,7 +7,8 @@ import {
   queryCourseListApi,
   addCourse,
   updateCourse,
-  deleteCourse
+  deleteCourse,
+  queryDictionariesDetailLike
 } from "@/api/table"
 import { type IGetTableData } from "@/api/table/types/table"
 import { type FormInstance, type FormRules, ElMessage, ElMessageBox } from "element-plus"
@@ -20,7 +21,7 @@ defineOptions({
 })
 
 const VITE_BASE_API = ref(import.meta.env.VITE_BASE_API + "user/upLoadImage")
-
+let optionsType = ref([])
 // 课程管理
 const loading = ref<boolean>(false)
 const { paginationData, handleCurrentChange, handleSizeChange } = usePagination()
@@ -79,6 +80,7 @@ const resetForm = () => {
   formData.insertTime = ""
   formData.lecturer = ""
   formData.updateTime = ""
+  imageUrl.value = ""
 }
 //#endregion
 
@@ -167,10 +169,33 @@ const updateFiles = (list: any) => {
 const handleAvatarSuccess = (res: any, file: any) => {
   imageUrl.value = URL.createObjectURL(file.raw)
   formData.courseImagePath = res.data
-  console.log(imageUrl)
+  console.log(formData.courseImagePath)
+  console.log(res.data)
 }
-
+const getTableDataDetail = () => {
+  queryDictionariesDetailLike({
+    currentPage: 1,
+    size: 100000,
+    parentCode: "course_classification",
+    type: 1
+    // username: searchData.username || undefined,
+    // phone: searchData.phone || undefined
+  })
+    .then((res: any) => {
+      console.log(res)
+      optionsType.value = res?.datas
+    })
+    .catch(() => {
+      optionsType.value = []
+    })
+}
 //#endregion
+
+onMounted(() => {
+  // 初始化执行的事件
+
+  getTableDataDetail()
+})
 
 /** 监听分页参数的变化 */
 watch([() => paginationData.currentPage, () => paginationData.pageSize], getTableData, { immediate: true })
@@ -262,10 +287,21 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
 
         <el-row :gutter="20">
           <el-col :span="12">
-            <el-form-item prop="courseClassify" label="课程分类">
-              <el-select v-model="formData.courseClassify" placeholder="课程分类">
+            <el-form-item prop="dictCode" label="课程分类">
+              <!-- <el-select v-model="formData.courseClassify" placeholder="课程分类">
                 <el-option label="理论知识" value="理论知识" />
-                <el-option label="技能训练" value="技能训练" /> </el-select></el-form-item
+                <el-option label="技能训练" value="技能训练" /> 
+              </el-select> -->
+
+              <el-select v-model="formData.dictCode" placeholder="请选择">
+                <el-option
+                  v-for="item in optionsType"
+                  :key="item.dictCode"
+                  :label="item.dictName"
+                  :value="item.dictCode"
+                >
+                </el-option>
+              </el-select> </el-form-item
           ></el-col>
           <el-col :span="12">
             <el-form-item prop="lecturer" label="主讲老师">
