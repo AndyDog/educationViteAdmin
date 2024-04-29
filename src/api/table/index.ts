@@ -240,3 +240,42 @@ export function addDictionaiesDetail(data: any) {
     data
   })
 }
+
+// 用户培训信息
+
+/** 用户培训信息-获取列表*/
+
+export function getUserTraining(data: any) {
+  return request({
+    url: "/training/getUserTraining",
+    method: "post",
+    data
+  })
+}
+
+/** 用户培训信息_增加*/
+export function addUserTraining(data: any) {
+  return request({
+    url: "/training/addUserTraining",
+    method: "post",
+    data
+  })
+}
+
+/** 用户培训信息_删除*/
+export function deleteUserTraining(data: any) {
+  return request({
+    url: "/training/deleteUserTraining",
+    method: "post",
+    data
+  })
+}
+
+/** 用户培训信息-修改*/
+export function updateUserTraining(data: any) {
+  return request({
+    url: "/training/updateUserTraining",
+    method: "post",
+    data
+  })
+}

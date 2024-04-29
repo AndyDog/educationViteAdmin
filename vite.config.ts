@@ -39,9 +39,9 @@ export default (configEnv: ConfigEnv): UserConfigExport => {
       /** 接口代理 */
       proxy: {
         "/medicine/": {
-          // target: "http://118.178.233.104:8080/medicine/",
+          target: "http://118.178.233.104:8080/medicine/",
           // target: 'http://10.105.100.24:8090',
-          target: "http://10.105.100.24:8090/medicine/",
+          // target: "http://10.105.100.24:8090/medicine/",
           ws: true,
           /** 是否允许跨域 */
           changeOrigin: true,

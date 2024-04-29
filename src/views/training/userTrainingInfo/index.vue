@@ -1,6 +1,16 @@
 <script lang="ts" setup>
-import { reactive, ref, watch } from "vue"
-import { createTableDataApi, deleteTableDataApi, updateTableDataApi, getTableDataApi } from "@/api/table"
+import { onMounted, reactive, ref, watch } from "vue"
+import {
+  createTableDataApi,
+  deleteTableDataApi,
+  updateTableDataApi,
+  getTableDataApi,
+  queryInfomationList,
+  getUserTraining,
+  addUserTraining,
+  deleteUserTraining,
+  updateUserTraining
+} from "@/api/table"
 import { type IGetTableData } from "@/api/table/types/table"
 import { type FormInstance, type FormRules, ElMessage, ElMessageBox } from "element-plus"
 import { Search, Refresh, CirclePlus, Delete, Download, RefreshRight } from "@element-plus/icons-vue"
@@ -17,29 +27,34 @@ const { paginationData, handleCurrentChange, handleSizeChange } = usePagination(
 const dialogVisible = ref<boolean>(false)
 const formRef = ref<FormInstance | null>(null)
 const formData = reactive({
-  username: "",
-  password: ""
+  userTrainingId: "",
+  userId: "",
+  itemId: ""
 })
 const formRules: FormRules = reactive({
-  username: [{ required: true, trigger: "blur", message: "请输入用户名" }],
-  password: [{ required: true, trigger: "blur", message: "请输入密码" }]
+  userTrainingId: [{ required: true, trigger: "blur", message: "请选择用户" }],
+  userId: [{ required: true, trigger: "blur", message: "请选择培训信息" }]
 })
+
+let optionstraining = ref([])
+
 const handleCreate = () => {
   formRef.value?.validate((valid: boolean) => {
     if (valid) {
       if (currentUpdateId.value === undefined) {
-        createTableDataApi({
-          username: formData.username,
-          password: formData.password
+        addUserTraining({
+          userTrainingId: formData.userTrainingId,
+          userId: formData.userId
         }).then(() => {
           ElMessage.success("新增成功")
           dialogVisible.value = false
           getTableData()
         })
       } else {
-        updateTableDataApi({
+        updateUserTraining({
           id: currentUpdateId.value,
-          username: formData.username
+          userTrainingId: formData.userTrainingId,
+          userId: formData.userId
         }).then(() => {
           ElMessage.success("修改成功")
           dialogVisible.value = false
@@ -53,14 +68,14 @@ const handleCreate = () => {
 }
 const resetForm = () => {
   currentUpdateId.value = undefined
-  formData.username = ""
-  formData.password = ""
+  formData.userTrainingId = ""
+  formData.userId = ""
 }
 //#endregion
 
 //#region 删
 const handleDelete = (row: IGetTableData) => {
-  ElMessageBox.confirm(`正在删除用户：${row.username}，确认删除？`, "提示", {
+  ElMessageBox.confirm(`正在删除：${row.itemName}，确认删除？`, "提示", {
     confirmButtonText: "确定",
     cancelButtonText: "取消",
     type: "warning"
@@ -77,7 +92,7 @@ const handleDelete = (row: IGetTableData) => {
 const currentUpdateId = ref<undefined | string>(undefined)
 const handleUpdate = (row: IGetTableData) => {
   currentUpdateId.value = row.id
-  formData.username = row.username
+  formData.userTrainingId = row.userTrainingId
   dialogVisible.value = true
 }
 //#endregion
@@ -86,20 +101,21 @@ const handleUpdate = (row: IGetTableData) => {
 const tableData = ref<IGetTableData[]>([])
 const searchFormRef = ref<FormInstance | null>(null)
 const searchData = reactive({
-  username: "",
-  phone: ""
+  userTrainingId: "",
+  userId: ""
 })
 const getTableData = () => {
   loading.value = true
-  getTableDataApi({
-    currentPage: paginationData.currentPage,
+  getUserTraining({
+    page: paginationData.currentPage,
     size: paginationData.pageSize,
-    username: searchData.username || undefined,
-    phone: searchData.phone || undefined
+    userId: formData.userId || undefined,
+    userTrainingId: formData.userTrainingId || undefined
   })
     .then((res) => {
-      paginationData.total = res.data.total
-      tableData.value = res.data.list
+      // paginationData.total = res.data.total
+      paginationData.total = res?.datas?.length
+      tableData.value = res?.datas
     })
     .catch(() => {
       tableData.value = []
@@ -124,7 +140,25 @@ const resetSearch = () => {
 const handleRefresh = () => {
   getTableData()
 }
+
+// 获取培训信息下拉列表
+const getqueryInfomationList = () => {
+  // loading.value = true
+  queryInfomationList({
+    currentPage: 1,
+    size: 99999
+  }).then((res: any) => {
+    console.log(res)
+    optionstraining.value = res?.datas
+    console.log(optionstraining)
+  })
+}
+
 //#endregion
+onMounted(() => {
+  getqueryInfomationList()
+  // getTableData()
+})
 
 /** 监听分页参数的变化 */
 watch([() => paginationData.currentPage, () => paginationData.pageSize], getTableData, { immediate: true })
@@ -134,11 +168,36 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
   <div class="app-container">
     <el-card v-loading="loading" shadow="never" class="search-wrapper">
       <el-form ref="searchFormRef" :inline="true" :model="searchData">
-        <el-form-item prop="username" label="培训">
-          <el-input v-model="searchData.username" placeholder="请输入" />
+        <el-form-item prop="trainingId" label="培训">
+          <el-select style="width: 150px" v-model="searchData.itemId" placeholder="请选择">
+            <div class="customselect">
+              <el-row :gutter="20">
+                <el-col :span="12"> <span>培训代码</span></el-col>
+                <el-col :span="12"> <span>培训名称</span></el-col>
+              </el-row>
+            </div>
+            <el-option
+              v-for="item in optionstraining"
+              :key="item.trainingCode"
+              :label="item.trainingName"
+              :value="item.trainingCode"
+            >
+              <el-row :gutter="20">
+                <el-col :span="12">
+                  <span>{{ item.trainingCode }}</span></el-col
+                >
+                <el-col :span="12">
+                  <span> {{ item.trainingName }}</span></el-col
+                >
+              </el-row>
+            </el-option>
+          </el-select>
+
+          <!-- <SelectTable v-model:data="searchData.trainingId" :fields="fields" :tableData="optionstraining" :label="label"
+            :objKey="objKey" :border="true"></SelectTable> -->
         </el-form-item>
-        <el-form-item prop="phone" label="课程">
-          <el-input v-model="searchData.phone" placeholder="请输入" />
+        <el-form-item prop="phone" label="用户">
+          <el-input v-model="searchData.userId" placeholder="请输入" />
         </el-form-item>
         <el-form-item>
           <el-button type="primary" :icon="Search" @click="handleSearch">查询</el-button>
@@ -164,18 +223,10 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
       <div class="table-wrapper">
         <el-table :data="tableData">
           <el-table-column type="selection" width="50" align="center" />
-          <el-table-column prop="username" label="培训" align="center" />
-
-          <el-table-column prop="phone" label="课程" align="center" />
-          <el-table-column prop="email" label="分类" align="center" />
-          <!-- <el-table-column prop="status" label="状态" align="center">
-            <template #default="scope">
-              <el-tag v-if="scope.row.status" type="success" effect="plain">启用</el-tag>
-              <el-tag v-else type="danger" effect="plain">禁用</el-tag>
-            </template>
-          </el-table-column> -->
-          <el-table-column prop="createTime" label="负责人" align="center" />
-          <el-table-column fixed="right" label="操作" width="150" align="center">
+          <el-table-column prop="userName" label="用户" align="center" />
+          <el-table-column prop="itemName" label="培训" align="center" />
+          <el-table-column prop="updataTime" label="更新时间" align="center" />
+          <el-table-column label="操作" align="center">
             <template #default="scope">
               <el-button type="primary" text bg size="small" @click="handleUpdate(scope.row)">修改</el-button>
               <el-button type="danger" text bg size="small" @click="handleDelete(scope.row)">删除</el-button>
@@ -205,38 +256,35 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
     >
       <el-form ref="formRef" :model="formData" :rules="formRules" label-width="140px" label-position="left">
         <el-form-item prop="username" label="培训">
+          <el-select v-model="formData.itemId" placeholder="请选择">
+            <div class="customselect">
+              <el-row :gutter="20">
+                <el-col :span="12"> <span>培训代码</span></el-col>
+                <el-col :span="12"> <span>培训名称</span></el-col>
+              </el-row>
+            </div>
+            <el-option
+              v-for="item in optionstraining"
+              :key="item.trainingCode"
+              :label="item.trainingName"
+              :value="item.trainingCode"
+            >
+              <el-row :gutter="20">
+                <el-col :span="12">
+                  <span>{{ item.trainingCode }}</span></el-col
+                >
+                <el-col :span="12">
+                  <span> {{ item.trainingName }}</span></el-col
+                >
+              </el-row>
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item prop="password" label="用户">
           <el-select v-model="formData.password" placeholder="Activity zone">
             <el-option label="Zone one" value="shanghai" />
             <el-option label="Zone two" value="beijing" />
           </el-select>
-        </el-form-item>
-        <el-form-item prop="password" label="分类">
-          <el-select v-model="formData.password" placeholder="Activity zone">
-            <el-option label="Zone one" value="shanghai" />
-            <el-option label="Zone two" value="beijing" />
-          </el-select>
-        </el-form-item>
-
-        <el-form-item prop="password" label="课程">
-          <el-select v-model="formData.password" placeholder="Activity zone">
-            <el-option label="Zone one" value="shanghai" />
-            <el-option label="Zone two" value="beijing" />
-          </el-select>
-        </el-form-item>
-
-        <el-form-item prop="password" label="负责人">
-          <el-select v-model="formData.password" placeholder="Activity zone">
-            <el-option label="Zone one" value="shanghai" />
-            <el-option label="Zone two" value="beijing" />
-          </el-select>
-        </el-form-item>
-
-        <el-form-item prop="password" label="学习成绩占比">
-          <el-input-number v-model="formData.num" :min="1" :max="100" />
-        </el-form-item>
-
-        <el-form-item prop="password" label="考试成绩占比">
-          <el-input-number v-model="formData.num1" :min="1" :max="100" />
         </el-form-item>
       </el-form>
       <template #footer>

@@ -290,7 +290,7 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
             <el-form-item prop="dictCode" label="课程分类">
               <!-- <el-select v-model="formData.courseClassify" placeholder="课程分类">
                 <el-option label="理论知识" value="理论知识" />
-                <el-option label="技能训练" value="技能训练" /> 
+                <el-option label="技能训练" value="技能训练" />
               </el-select> -->
 
               <el-select v-model="formData.dictCode" placeholder="请选择">
