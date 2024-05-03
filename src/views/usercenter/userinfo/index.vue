@@ -17,339 +17,249 @@ defineOptions({
   name: "ElementPlus"
 })
 
-const VITE_BASE_API = ref(import.meta.env.VITE_BASE_API + "user/upLoadImage")
-
-const loading = ref<boolean>(false)
-const { paginationData, handleCurrentChange, handleSizeChange } = usePagination()
-//引入组件
-import uploadImg from "@/components/uploadImg.vue"
-import { json } from "stream/consumers"
-//#region 增
-const dialogVisible = ref<boolean>(false)
-const formRef = ref<FormInstance | null>(null)
-const formData = reactive({
-  imageKey: "",
-  imageValue: "",
-  imagePath: "",
-  sort: "",
-  type: 1,
-  userId: "",
-  imageKeys: []
-})
-let imageUrl = ref<any>("")
-const formRules: FormRules = reactive({
-  imageKey: [{ required: true, trigger: "blur", message: "请输入图片KEY" }],
-  imageValue: [{ required: true, trigger: "blur", message: "请输入图片名称" }],
-  imagePath: [{ required: true, trigger: "change", message: "请上传图片" }]
-})
-const handleCreate = () => {
-  formRef.value?.validate((valid: boolean) => {
-    if (valid) {
-      if (currentUpdateId.value === undefined) {
-        addImagesApi(formData).then(() => {
-          ElMessage.success("新增成功")
-          dialogVisible.value = false
-          getTableData()
-        })
-      } else {
-        let formDatatemp = JSON.parse(JSON.stringify(formData))
-        formDatatemp.type = 2
-        updateTableDataApi(formDatatemp).then(() => {
-          ElMessage.success("修改成功")
-          dialogVisible.value = false
-          getTableData()
-        })
-      }
-    } else {
-      return false
-    }
-  })
-}
-const resetForm = () => {
-  currentUpdateId.value = undefined
-  formData.username = ""
-  formData.password = ""
-}
-//#endregion
-
-//#region 删
-const handleDelete = (row: IGetTableData) => {
-  ElMessageBox.confirm(`正在删除图片：${row.imageValue}，确认删除？`, "提示", {
-    confirmButtonText: "确定",
-    cancelButtonText: "取消",
-    type: "warning"
-  }).then(() => {
-    let obj = {}
-    obj.imageKeys = [row.imageKey]
-    obj.type = 2
-    deleteTableDataApi(obj).then(() => {
-      ElMessage.success("删除成功")
-      getTableData()
-    })
-  })
-}
-//#endregion
-
-//#region 改
-const currentUpdateId = ref<undefined | string>(undefined)
-const handleUpdate = (row: IGetTableData) => {
-  currentUpdateId.value = row.id
-  formData.imageKey = row.imageKey
-  formData.imageValue = row.imageValue
-  formData.imagePath = row.imagePath
-
-  // imageKey: "",
-  // imageValue: "",
-  // imagePath: "",
-  // sort: "",
-  // type: 1,
-  // userId: "",
-  // imageKeys: []
-
-  dialogVisible.value = true
-}
-//#endregion
-
-//#region 查
-const tableData = ref<IGetTableData[]>([])
-const searchFormRef = ref<FormInstance | null>(null)
-const searchData = reactive({
-  username: "",
-  phone: ""
-})
-const getTableData = () => {
-  loading.value = true
-  getTableDataApi({
-    currentPage: paginationData.currentPage,
-    size: paginationData.pageSize,
-    username: searchData.username || undefined,
-    phone: searchData.phone || undefined
-  })
-    .then((res) => {
-      console.log(res)
-      paginationData.total = res.data.length
-      tableData.value = res.data
-    })
-    .catch(() => {
-      tableData.value = []
-    })
-    .finally(() => {
-      loading.value = false
-    })
-}
-const handleSearch = () => {
-  if (paginationData.currentPage === 1) {
-    getTableData()
+const tags = reactive(["很有想法的", "专注设计", "辣~", "大长腿", "川妹子", "海纳百川"])
+const tagInputVisible = ref<boolean>(false)
+const tagInputValue = ref<string>("")
+const teams = ref<any[]>([])
+const teamSpinning = ref<boolean>(true)
+const tabListNoTitle = ref<any[]>([
+  {
+    key: "app",
+    tab: "应用(8)"
   }
-  paginationData.currentPage = 1
+])
+const noTitleKey = ref<string>("app")
+
+const avatar = ref<string>("https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png")
+
+const getTeams = () => {
+  // this.$http.get('/workplace/teams').then((res) => {
+  //   this.teams = res.result
+  //   this.teamSpinning = false
+  // })
 }
-const resetSearch = () => {
-  searchFormRef.value?.resetFields()
-  if (paginationData.currentPage === 1) {
-    getTableData()
+
+const handleTabChange = (key, type) => {
+  // this[type] = key
+}
+
+const handleTagClose = (removeTag) => {
+  const tagsTemp = tags.filter((tag) => tag !== removeTag)
+  tags = tagsTemp
+}
+
+const showTagInput = () => {
+  tagInputVisible.value = true
+  // this.$nextTick(() => {
+  //   this.$refs.tagInput.focus()
+  // })
+}
+
+const handleInputChange = (e) => {
+  // this.tagInputValue = e.target.value
+}
+
+const handleTagInputConfirm = () => {
+  const inputValue = tagInputValue
+  let tags = tags
+  if (inputValue && !tags.includes(inputValue)) {
+    tags = [...tags, inputValue]
   }
-  paginationData.currentPage = 1
+
+  // Object.assign(this, {
+  //   tags,
+  //   tagInputVisible: false,
+  //   tagInputValue: '',
+  // })
 }
-const handleRefresh = () => {
-  getTableData()
-}
-
-const addImage = () => {
-  dialogVisible.value = true
-  formData.imageKey = ""
-  formData.imageValue = ""
-  formData.imagePath = ""
-  imageUrl.value = ""
-}
-
-// 上传的图片附件
-const updateFiles = (list: any) => {
-  if (list.length > 0) {
-    formData.pic = list
-  }
-}
-
-const handleAvatarSuccess = (res: any, file: any) => {
-  imageUrl.value = URL.createObjectURL(file.raw)
-  formData.imagePath = res.data
-  console.log(imageUrl)
-}
-// const beforeAvatarUpload = (file: any) => {
-//   const isJPG = file.type === "image/jpeg"
-//   const isLt2M = file.size / 1024 / 1024 < 2
-
-//   if (!isJPG) {
-//     ElMessage.error("上传头像图片只能是 JPG 格式!")
-//   }
-//   if (!isLt2M) {
-//     ElMessage.error("上传头像图片大小不能超过 2MB!")
-//   }
-//   return isJPG && isLt2M
-// }
-
-//#endregion
-
-/** 监听分页参数的变化 */
-watch([() => paginationData.currentPage, () => paginationData.pageSize], getTableData, { immediate: true })
 </script>
 
 <template>
-  <div class="app-container">
-    <el-card v-loading="loading" shadow="never" class="search-wrapper">
-      <el-form ref="searchFormRef" :inline="true" :model="searchData">
-        <el-form-item prop="username" label="图片KEY">
-          <el-input v-model="searchData.username" placeholder="请输入" />
-        </el-form-item>
-        <el-form-item prop="phone" label="图片名称">
-          <el-input v-model="searchData.phone" placeholder="请输入" />
-        </el-form-item>
-        <el-form-item>
-          <el-button type="primary" :icon="Search" @click="handleSearch">查询</el-button>
-          <el-button :icon="Refresh" @click="resetSearch">重置</el-button>
-        </el-form-item>
-      </el-form>
-    </el-card>
-    <el-card v-loading="loading" shadow="never">
-      <div class="toolbar-wrapper">
-        <div>
-          <el-button type="primary" :icon="CirclePlus" @click="addImage">添加</el-button>
-          <el-button type="danger" :icon="Delete">批量删除</el-button>
-        </div>
-        <div>
-          <el-tooltip content="下载">
-            <el-button type="primary" :icon="Download" circle />
-          </el-tooltip>
-          <el-tooltip content="刷新表格">
-            <el-button type="primary" :icon="RefreshRight" circle @click="handleRefresh" />
-          </el-tooltip>
-        </div>
-      </div>
-      <div class="table-wrapper">
-        <el-table :data="tableData">
-          <el-table-column type="selection" width="50" align="center" />
-          <el-table-column prop="imageKey" label="图片KEY" align="center" />
-          <!-- <el-table-column prop="roles" label="角色" align="center">
-            <template #default="scope">
-              <el-tag v-if="scope.row.roles === 'admin'" effect="plain">admin</el-tag>
-              <el-tag v-else type="warning" effect="plain">{{ scope.row.roles }}</el-tag>
-            </template>
-          </el-table-column> -->
-          <el-table-column prop="imageValue" label="图片名称" align="center" />
-          <el-table-column prop="imagePath" label="图片地址" align="center" />
-          <el-table-column prop="updateTime" label="更新时间" align="center" />
-          <el-table-column fixed="right" label="操作" width="160" align="center">
-            <template #default="scope">
-              <el-button type="primary" text size="small" icon="Edit" @click="handleUpdate(scope.row)">修改</el-button>
-              <el-button type="danger" text size="small" icon="Delete" @click="handleDelete(scope.row)">删除</el-button>
-            </template>
-          </el-table-column>
-        </el-table>
-      </div>
-      <div class="pager-wrapper">
-        <el-pagination
-          background
-          :layout="paginationData.layout"
-          :page-sizes="paginationData.pageSizes"
-          :total="paginationData.total"
-          :page-size="paginationData.pageSize"
-          :currentPage="paginationData.currentPage"
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-        />
-      </div>
-    </el-card>
-    <!-- 新增/修改 -->
-    <el-dialog
-      v-model="dialogVisible"
-      :title="currentUpdateId === undefined ? '新增图片' : '修改图片'"
-      @close="resetForm"
-      width="70%"
-    >
-      <el-form ref="formRef" :model="formData" :rules="formRules" label-width="100px" label-position="left">
-        <el-form-item prop="imageKey" label="图片KEY">
-          <el-input v-model="formData.imageKey" placeholder="请输入" />
-        </el-form-item>
-        <el-form-item prop="imageValue" label="图片名称">
-          <el-input v-model="formData.imageValue" placeholder="请输入" />
-        </el-form-item>
+  <div class="page-header-index-wide page-header-wrapper-grid-content-main">
+    <el-row :gutter="24">
+      <el-col :md="6" :lg="6" :xs="24" :sm="24">
+        <el-card :bordered="false">
+          <div class="account-center-avatarHolder">
+            <div class="avatar">
+              <img :src="avatar" />
+            </div>
+            <div class="username">梁海军</div>
+            <!-- <div class="bio">海纳百川，有容乃大</div> -->
+          </div>
+          <div class="account-center-detail">
+            <p><i class="title"></i>交互专家</p>
+            <p><i class="group"></i>蚂蚁金服－某某某事业群－某某平台部－某某技术部－UED</p>
+            <p>
+              <i class="address"></i>
+              <span>北京市</span>
+              <!-- <span>杭州市</span> -->
+            </p>
+          </div>
+          <a-divider />
 
-        <el-form-item label="照片:" prop="imagePath">
-          <!-- //pic为了验证图片是必传的 -->
-          <el-input v-model="formData.imagePath" style="height: 0px; width: 0px; visibility: hidden"></el-input>
-          <!-- <upload-img @updateFileList="updateFiles"></upload-img> -->
+          <div class="account-center-tags">
+            <div class="tagsTitle">标签</div>
+            <div>
+              <template v-for="(tag, index) in tags">
+                <el-tooltip v-if="tag.length > 20" :key="tag" :title="tag">
+                  <el-tag :key="tag" :closable="index !== 0" :close="() => handleTagClose(tag)">{{
+                    `${tag.slice(0, 20)}...`
+                  }}</el-tag>
+                </el-tooltip>
+                <el-tag v-else :key="tag + 1" :closable="index !== 0" :close="() => handleTagClose(tag)">{{
+                  tag
+                }}</el-tag>
+              </template>
+              <a-input
+                v-if="tagInputVisible"
+                ref="tagInput"
+                type="text"
+                size="small"
+                key="tagInputVisible"
+                :style="{ width: '78px' }"
+                :value="tagInputValue"
+                @change="handleInputChange"
+                @blur="handleTagInputConfirm"
+                @keyup.enter="handleTagInputConfirm"
+              />
+              <el-tag v-else key="newTag" @click="showTagInput" style="background: #fff; borderstyle: dashed">
+                <a-icon type="plus" />New Tag
+              </el-tag>
+            </div>
+          </div>
+          <a-divider :dashed="true" />
 
-          <el-upload
-            class="avatar-uploader"
-            :action="VITE_BASE_API"
-            :show-file-list="false"
-            :on-success="handleAvatarSuccess"
-          >
-            <img v-if="imageUrl" :src="imageUrl" class="avatar" />
-            <!-- <i v-else class="el-icon-plus avatar-uploader-icon"></i> -->
-            <el-icon v-else class="avatar-uploader-icon">
-              <Plus />
-            </el-icon>
-            <!-- <i class="el-icon-upload"></i>
-            <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
-            <div class="el-upload__tip" slot="tip">只能上传jpg/png文件，且不超过500kb</div> -->
-          </el-upload>
-        </el-form-item>
-      </el-form>
-      <template #footer>
-        <el-button @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="handleCreate">确认</el-button>
-      </template>
-    </el-dialog>
+          <div class="account-center-team">
+            <div class="teamTitle">团队</div>
+            <a-spin :spinning="teamSpinning">
+              <div class="members">
+                <el-row>
+                  <el-col :span="12" v-for="(item, index) in teams" :key="index">
+                    <a>
+                      <a-avatar size="small" :src="item.avatar" />
+                      <span class="member">{{ item.name }}</span>
+                    </a>
+                  </el-col>
+                </el-row>
+              </div>
+            </a-spin>
+          </div>
+        </el-card>
+      </el-col>
+      <el-col :md="18" :lg="18" :xs="24" :sm="24">
+        <el-card
+          style="width: 100%"
+          :bordered="false"
+          :tabList="tabListNoTitle"
+          :activeTabKey="noTitleKey"
+          @tabChange="(key) => handleTabChange(key, 'noTitleKey')"
+        >
+          <article-page v-if="noTitleKey === 'article'"></article-page>
+          <app-page v-else-if="noTitleKey === 'app'"></app-page>
+          <project-page v-else-if="noTitleKey === 'project'"></project-page>
+        </el-card>
+      </el-col>
+    </el-row>
   </div>
 </template>
 
-<style>
-.avatar-uploader .el-upload {
-  border: 1px dashed #d9d9d9;
-  border-radius: 6px;
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
-}
-.avatar-uploader .el-upload:hover {
-  border-color: #409eff;
-}
-.avatar-uploader-icon {
-  font-size: 28px;
-  color: #8c939d;
-  width: 178px;
-  height: 178px;
-  line-height: 178px;
-  text-align: center;
-}
-.avatar {
-  width: 178px;
-  height: 178px;
-  display: block;
-  object-fit: contain;
-}
-</style>
-
 <style lang="scss" scoped>
-.search-wrapper {
-  margin-bottom: 20px;
-  :deep(.el-card__body) {
-    padding-bottom: 2px;
+.page-header-wrapper-grid-content-main {
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+  transition: 0.3s;
+  padding: 10px;
+  .account-center-avatarHolder {
+    text-align: center;
+    margin-bottom: 24px;
+
+    & > .avatar {
+      margin: 0 auto;
+      width: 104px;
+      height: 104px;
+      margin-bottom: 20px;
+      border-radius: 50%;
+      overflow: hidden;
+      img {
+        height: 100%;
+        width: 100%;
+      }
+    }
+
+    .username {
+      color: rgba(0, 0, 0, 0.85);
+      font-size: 20px;
+      line-height: 28px;
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
   }
-}
 
-.toolbar-wrapper {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 20px;
-}
+  .account-center-detail {
+    p {
+      margin-bottom: 8px;
+      padding-left: 26px;
+      position: relative;
+    }
 
-.table-wrapper {
-  margin-bottom: 20px;
-}
+    i {
+      position: absolute;
+      height: 14px;
+      width: 14px;
+      left: 0;
+      top: 4px;
+      background: url(https://gw.alipayobjects.com/zos/rmsportal/pBjWzVAHnOOtAUvZmZfy.svg);
+    }
 
-.pager-wrapper {
-  display: flex;
-  justify-content: flex-end;
+    .title {
+      background-position: 0 0;
+    }
+    .group {
+      background-position: 0 -22px;
+    }
+    .address {
+      background-position: 0 -44px;
+    }
+  }
+
+  .account-center-tags {
+    .ant-tag {
+      margin-bottom: 8px;
+    }
+  }
+
+  .account-center-team {
+    .members {
+      a {
+        display: block;
+        margin: 12px 0;
+        line-height: 24px;
+        height: 24px;
+        .member {
+          font-size: 14px;
+          color: rgba(0, 0, 0, 0.65);
+          line-height: 24px;
+          max-width: 100px;
+          vertical-align: top;
+          margin-left: 12px;
+          transition: all 0.3s;
+          display: inline-block;
+        }
+        &:hover {
+          span {
+            color: #1890ff;
+          }
+        }
+      }
+    }
+  }
+
+  .tagsTitle,
+  .teamTitle {
+    font-weight: 500;
+    color: rgba(0, 0, 0, 0.85);
+    margin-bottom: 12px;
+  }
 }
 </style>
