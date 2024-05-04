@@ -6,7 +6,9 @@ import {
   // updateTableDataApi,
   // getTableDataApi,
   announcementadd,
-  announcementlist
+  announcementquery,
+  announcementdelete,
+  announcementupdate
 } from "@/api/notice"
 import { type IGetTableData } from "@/api/table/types/table"
 import { type FormInstance, type FormRules, ElMessage, ElMessageBox } from "element-plus"
@@ -59,14 +61,14 @@ const handleCreate = () => {
           getTableData()
         })
       } else {
-        // updateTableDataApi({
-        //   id: currentUpdateId.value,
-        //   username: formData.username
-        // }).then(() => {
-        //   ElMessage.success("修改成功")
-        //   dialogVisible.value = false
-        //   getTableData()
-        // })
+        announcementupdate({
+          id: currentUpdateId.value,
+          username: formData.username
+        }).then(() => {
+          ElMessage.success("修改成功")
+          dialogVisible.value = false
+          getTableData()
+        })
       }
     } else {
       return false
@@ -89,10 +91,10 @@ const handleDelete = (row: IGetTableData) => {
     cancelButtonText: "取消",
     type: "warning"
   }).then(() => {
-    // deleteTableDataApi(row.id).then(() => {
-    //   ElMessage.success("删除成功")
-    //   getTableData()
-    // })
+    announcementdelete(row.id).then(() => {
+      ElMessage.success("删除成功")
+      getTableData()
+    })
   })
 }
 //#endregion
@@ -115,7 +117,7 @@ const searchData = reactive({
 })
 const getTableData = () => {
   loading.value = true
-  announcementlist({
+  announcementquery({
     currentPage: paginationData.currentPage,
     size: paginationData.pageSize,
     state: "0",
@@ -223,10 +225,10 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
           <el-table-column type="selection" width="50" align="center" />
           <el-table-column prop="title" label="标题" align="center" />
 
-          <el-table-column prop="type" label="通知类型" align="center" />
+          <el-table-column prop="dictName" label="通知类型" align="center" />
           <el-table-column prop="status" label="置顶" align="center">
             <template #default="scope">
-              <el-switch v-model="scope.row.status" />
+              <el-switch v-model="scope.row.state" />
             </template>
           </el-table-column>
           <el-table-column prop="insertTime" label="创建时间" align="center" />

@@ -29,7 +29,7 @@ const formRef = ref<FormInstance | null>(null)
 const formData = reactive({
   userTrainingId: "",
   userId: "",
-  itemId: ""
+  trainingId: ""
 })
 const formRules: FormRules = reactive({
   userTrainingId: [{ required: true, trigger: "blur", message: "请选择用户" }],
@@ -44,7 +44,8 @@ const handleCreate = () => {
       if (currentUpdateId.value === undefined) {
         addUserTraining({
           userTrainingId: formData.userTrainingId,
-          userId: formData.userId
+          // userId: formData.userId,
+          trainingId: formData.trainingId
         }).then(() => {
           ElMessage.success("新增成功")
           dialogVisible.value = false
@@ -169,7 +170,7 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
     <el-card v-loading="loading" shadow="never" class="search-wrapper">
       <el-form ref="searchFormRef" :inline="true" :model="searchData">
         <el-form-item prop="trainingId" label="培训">
-          <el-select style="width: 150px" v-model="searchData.itemId" placeholder="请选择">
+          <el-select style="width: 150px" v-model="searchData.trainingId" placeholder="请选择">
             <div class="customselect">
               <el-row :gutter="20">
                 <el-col :span="12"> <span>培训代码</span></el-col>
@@ -224,8 +225,8 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
         <el-table :data="tableData">
           <el-table-column type="selection" width="50" align="center" />
           <el-table-column prop="userName" label="用户" align="center" />
-          <el-table-column prop="itemName" label="培训" align="center" />
-          <el-table-column prop="updataTime" label="更新时间" align="center" />
+          <el-table-column prop="trainingName" label="培训" align="center" />
+          <el-table-column prop="updateTime" label="更新时间" align="center" />
           <el-table-column label="操作" align="center">
             <template #default="scope">
               <el-button type="primary" text bg size="small" @click="handleUpdate(scope.row)">修改</el-button>
@@ -256,7 +257,7 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
     >
       <el-form ref="formRef" :model="formData" :rules="formRules" label-width="140px" label-position="left">
         <el-form-item prop="username" label="培训">
-          <el-select v-model="formData.itemId" placeholder="请选择">
+          <el-select v-model="formData.trainingId" placeholder="请选择">
             <div class="customselect">
               <el-row :gutter="20">
                 <el-col :span="12"> <span>培训代码</span></el-col>
@@ -281,7 +282,7 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
           </el-select>
         </el-form-item>
         <el-form-item prop="password" label="用户">
-          <el-select v-model="formData.password" placeholder="Activity zone">
+          <el-select v-model="formData.userId" placeholder="Activity zone">
             <el-option label="Zone one" value="shanghai" />
             <el-option label="Zone two" value="beijing" />
           </el-select>

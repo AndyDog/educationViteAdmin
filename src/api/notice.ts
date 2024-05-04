@@ -10,27 +10,27 @@ export function announcementadd(data: any) {
 }
 
 /** 删 */
-export function deleteTableDataApi(data: any) {
+export function announcementdelete(data: any) {
   return request({
-    url: `/user/deleteImages`,
+    url: `/announcement/delete`,
     method: "post",
     data
   })
 }
 
 /** 改 */
-export function updateTableDataApi(data: any) {
+export function announcementupdate(data: any) {
   return request({
-    url: "/user/addImages",
+    url: "/announcement/update",
     method: "post",
     data
   })
 }
 
 /** 查询公开公告管理列表  */
-export function announcementlist(params: any) {
+export function announcementquery(params: any) {
   return request({
-    url: "/user/queryImages",
+    url: "/announcement/query",
     method: "post",
     params
   })
