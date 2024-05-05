@@ -17,8 +17,19 @@ const { paginationData, handleCurrentChange, handleSizeChange } = usePagination(
 const dialogVisible = ref<boolean>(false)
 const formRef = ref<FormInstance | null>(null)
 const formData = reactive({
-  username: "",
-  password: ""
+  email: "",
+  gender: "",
+  idCard: "",
+  imageCode: "",
+  loginName: "",
+  page: 0,
+  passWord: "",
+  phone: "",
+  roleIds: "",
+  size: 0,
+  userId: "",
+  userIds: [],
+  userName: ""
 })
 const formRules: FormRules = reactive({
   username: [{ required: true, trigger: "blur", message: "请输入用户名" }],
@@ -137,9 +148,9 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
         <el-form-item prop="username" label="账号">
           <el-input v-model="searchData.username" placeholder="请输入" />
         </el-form-item>
-        <el-form-item prop="phone" label="用户类型">
+        <!-- <el-form-item prop="phone" label="用户类型">
           <el-input v-model="searchData.phone" placeholder="请输入" />
-        </el-form-item>
+        </el-form-item> -->
         <el-form-item prop="phone" label="姓名">
           <el-input v-model="searchData.phone" placeholder="请输入" />
         </el-form-item>
@@ -149,18 +160,18 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
         <el-form-item prop="phone" label="性别">
           <el-input v-model="searchData.phone" placeholder="请输入" />
         </el-form-item>
-        <el-form-item prop="phone" label="出生年月">
+        <!-- <el-form-item prop="phone" label="出生年月">
           <el-input v-model="searchData.phone" placeholder="请输入" />
-        </el-form-item>
-        <el-form-item prop="phone" label="角色">
+        </el-form-item> -->
+        <!-- <el-form-item prop="phone" label="角色">
           <el-input v-model="searchData.phone" placeholder="请输入" />
-        </el-form-item>
+        </el-form-item> -->
         <el-form-item prop="phone" label="身份证号">
           <el-input v-model="searchData.phone" placeholder="请输入" />
         </el-form-item>
-        <el-form-item prop="phone" label="机构">
+        <!-- <el-form-item prop="phone" label="机构">
           <el-input v-model="searchData.phone" placeholder="请输入" />
-        </el-form-item>
+        </el-form-item> -->
         <el-form-item>
           <el-button type="primary" :icon="Search" @click="handleSearch">查询</el-button>
           <el-button :icon="Refresh" @click="resetSearch">重置</el-button>
@@ -186,26 +197,27 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
         <el-table :data="tableData">
           <el-table-column type="selection" width="50" align="center" />
           <el-table-column prop="username" label="账号" align="center" />
-          <el-table-column prop="roles" label="用户类型" align="center">
+          <el-table-column prop="phone" label="手机号" align="center" />
+          <el-table-column prop="email" label="姓名" align="center" />
+          <el-table-column prop="createTime" label="身份证号" align="center" />
+          <el-table-column prop="createTime" label="角色" align="center" />
+          <el-table-column prop="createTime" label="机构" align="center" />
+          <el-table-column prop="createTime" label="分组" align="center" />
+
+          <el-table-column prop="roles" label="状态" align="center">
             <template #default="scope">
               <el-tag v-if="scope.row.roles === 'admin'" effect="plain">admin</el-tag>
               <el-tag v-else type="warning" effect="plain">{{ scope.row.roles }}</el-tag>
             </template>
           </el-table-column>
-          <el-table-column prop="phone" label="手机号" align="center" />
-          <el-table-column prop="email" label="姓名" align="center" />
+          <!--
           <el-table-column prop="status" label="性别" align="center">
             <template #default="scope">
               <el-tag v-if="scope.row.status" type="success" effect="plain">启用</el-tag>
               <el-tag v-else type="danger" effect="plain">禁用</el-tag>
             </template>
           </el-table-column>
-          <el-table-column prop="createTime" label="出生年月" align="center" />
-
-          <el-table-column prop="createTime" label="角色" align="center" />
-          <el-table-column prop="createTime" label="身份证号" align="center" />
-          <el-table-column prop="createTime" label="机构" align="center" />
-          <el-table-column prop="createTime" label="分组" align="center" />
+          <el-table-column prop="createTime" label="出生年月" align="center" /> -->
 
           <el-table-column fixed="right" label="操作" width="150" align="center">
             <template #default="scope">
