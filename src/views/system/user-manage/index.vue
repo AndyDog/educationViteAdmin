@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import { reactive, ref, watch } from "vue"
-import { createTableDataApi, deleteTableDataApi, updateTableDataApi, getTableDataApi } from "@/api/table"
+import { onMounted, reactive, ref, watch } from "vue"
+import { useraddUser, usergetByUserLike, userdeleteUser, userupdateUser, usergetRole } from "@/api/user"
 import { type IGetTableData } from "@/api/table/types/table"
 import { type FormInstance, type FormRules, ElMessage, ElMessageBox } from "element-plus"
 import { Search, Refresh, CirclePlus, Delete, Download, RefreshRight } from "@element-plus/icons-vue"
@@ -9,49 +9,62 @@ import uploadImg from "@/components/uploadImg.vue"
 defineOptions({
   name: "ElementPlus"
 })
-
+const VITE_BASE_API = ref(import.meta.env.VITE_BASE_API + "user/upLoadImage")
 const loading = ref<boolean>(false)
 const { paginationData, handleCurrentChange, handleSizeChange } = usePagination()
-
+let optionsType = ref([])
 //#region 增
 const dialogVisible = ref<boolean>(false)
 const formRef = ref<FormInstance | null>(null)
 const formData = reactive({
+  birthday: "",
   email: "",
   gender: "",
+  id: 0,
   idCard: "",
-  imageCode: "",
+  imagePath: "",
+  insertTime: "",
+  intro: "",
   loginName: "",
-  page: 0,
-  passWord: "",
+  password: "",
   phone: "",
   roleIds: "",
-  size: 0,
+  status: "",
+  updateTime: "",
   userId: "",
-  userIds: [],
-  userName: ""
+  userName: "",
+  userRoleList: []
 })
+
+let imageUrl = ref<any>("")
+
 const formRules: FormRules = reactive({
-  username: [{ required: true, trigger: "blur", message: "请输入用户名" }],
-  password: [{ required: true, trigger: "blur", message: "请输入密码" }]
+  userId: [{ required: true, trigger: "blur", message: "请输入账号" }],
+  userName: [{ required: true, trigger: "blur", message: "请输入姓名" }],
+  userRoleList: [{ required: true, trigger: "blur", message: "请输入角色" }],
+  password: [{ required: true, trigger: "blur", message: "请输入登陆密码" }]
 })
 const handleCreate = () => {
   formRef.value?.validate((valid: boolean) => {
     if (valid) {
+      let param = JSON.parse(JSON.stringify(formData))
+      //
+      param.userRoleList = param.userRoleList.map((item) => {
+        let obj = {}
+        obj = optionsType.value.filter((itemm) => {
+          return itemm.roleCode == item
+        })
+        return obj
+      })
+
       if (currentUpdateId.value === undefined) {
-        createTableDataApi({
-          username: formData.username,
-          password: formData.password
-        }).then(() => {
+        useraddUser(param).then(() => {
           ElMessage.success("新增成功")
           dialogVisible.value = false
           getTableData()
         })
       } else {
-        updateTableDataApi({
-          id: currentUpdateId.value,
-          username: formData.username
-        }).then(() => {
+        userupdateUser(formData).then(() => {
           ElMessage.success("修改成功")
           dialogVisible.value = false
           getTableData()
@@ -64,19 +77,34 @@ const handleCreate = () => {
 }
 const resetForm = () => {
   currentUpdateId.value = undefined
-  formData.username = ""
+  formData.birthday = ""
+  formData.email = ""
+  formData.gender = ""
+  formData.id = 0
+  formData.imagePath = ""
+  formData.insertTime = ""
+  formData.intro = ""
+  formData.loginName = ""
   formData.password = ""
+
+  formData.phone = ""
+  formData.roleIds = ""
+  formData.status = ""
+  formData.updateTime = ""
+  formData.userId = ""
+  formData.userName = ""
+  formData.userRoleList = []
 }
 //#endregion
 
 //#region 删
 const handleDelete = (row: IGetTableData) => {
-  ElMessageBox.confirm(`正在删除用户：${row.username}，确认删除？`, "提示", {
+  ElMessageBox.confirm(`正在删除用户：${row.userName}，确认删除？`, "提示", {
     confirmButtonText: "确定",
     cancelButtonText: "取消",
     type: "warning"
   }).then(() => {
-    deleteTableDataApi(row.id).then(() => {
+    userdeleteUser(row.userId).then(() => {
       ElMessage.success("删除成功")
       getTableData()
     })
@@ -88,7 +116,7 @@ const handleDelete = (row: IGetTableData) => {
 const currentUpdateId = ref<undefined | string>(undefined)
 const handleUpdate = (row: IGetTableData) => {
   currentUpdateId.value = row.id
-  formData.username = row.username
+  formData.userName = row.userName
   dialogVisible.value = true
 }
 //#endregion
@@ -97,20 +125,33 @@ const handleUpdate = (row: IGetTableData) => {
 const tableData = ref<IGetTableData[]>([])
 const searchFormRef = ref<FormInstance | null>(null)
 const searchData = reactive({
-  username: "",
-  phone: ""
+  userId: "",
+  userName: "",
+  phone: "",
+  idCard: "",
+  gender: ""
 })
+
 const getTableData = () => {
   loading.value = true
-  getTableDataApi({
-    currentPage: paginationData.currentPage,
+  usergetByUserLike({
+    page: paginationData.currentPage,
     size: paginationData.pageSize,
-    username: searchData.username || undefined,
-    phone: searchData.phone || undefined
+    userId: searchData.userId || undefined,
+    userName: searchData.userName || undefined,
+    phone: searchData.phone || undefined,
+    idCard: searchData.idCard || undefined,
+    gender: searchData.gender || undefined
   })
     .then((res) => {
-      paginationData.total = res.data.total
-      tableData.value = res.data.list
+      paginationData.total = res?.datas?.length
+      // tableData.value = res?.datas
+      let result = res?.datas
+      tableData.value = result.map((item) => {
+        let obj = item
+        obj.statusFilter = obj.status == 1 ? true : false
+        return obj
+      })
     })
     .catch(() => {
       tableData.value = []
@@ -135,8 +176,35 @@ const resetSearch = () => {
 const handleRefresh = () => {
   getTableData()
 }
-//#endregion
 
+const handleAvatarSuccess = (res: any, file: any) => {
+  imageUrl.value = URL.createObjectURL(file.raw)
+  formData.imagePath = res.data
+  console.log(imageUrl)
+}
+const getTableDataDetail = () => {
+  usergetRole({
+    page: 1,
+    size: 100000
+    // parentCode: "course_classification",
+    // type: 1
+    // username: searchData.username || undefined,
+    // phone: searchData.phone || undefined
+  })
+    .then((res: any) => {
+      console.log(res)
+      optionsType.value = res?.datas
+    })
+    .catch(() => {
+      optionsType.value = []
+    })
+}
+//#endregion
+onMounted(() => {
+  // 初始化执行的事件
+
+  getTableDataDetail()
+})
 /** 监听分页参数的变化 */
 watch([() => paginationData.currentPage, () => paginationData.pageSize], getTableData, { immediate: true })
 </script>
@@ -196,18 +264,26 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
       <div class="table-wrapper">
         <el-table :data="tableData">
           <el-table-column type="selection" width="50" align="center" />
-          <el-table-column prop="username" label="账号" align="center" />
+          <el-table-column prop="userName" label="账号" align="center" />
           <el-table-column prop="phone" label="手机号" align="center" />
-          <el-table-column prop="email" label="姓名" align="center" />
-          <el-table-column prop="createTime" label="身份证号" align="center" />
-          <el-table-column prop="createTime" label="角色" align="center" />
+          <el-table-column prop="loginName" label="姓名" align="center" />
+          <el-table-column prop="idCard" label="身份证号" align="center" />
+          <el-table-column prop="createTime" label="角色" align="center">
+            <template #default="scope">
+              <div v-if="scope.row.userRoleList && scope.row.userRoleList.length > 0">
+                <el-tag effect="plain" v-for="item in scope.row.userRoleList">{{ item.roleName }}</el-tag>
+              </div>
+            </template>
+          </el-table-column>
           <el-table-column prop="createTime" label="机构" align="center" />
           <el-table-column prop="createTime" label="分组" align="center" />
 
-          <el-table-column prop="roles" label="状态" align="center">
+          <el-table-column prop="status" label="状态" align="center">
             <template #default="scope">
-              <el-tag v-if="scope.row.roles === 'admin'" effect="plain">admin</el-tag>
-              <el-tag v-else type="warning" effect="plain">{{ scope.row.roles }}</el-tag>
+              <el-switch v-model="scope.row.statusFilter" />
+              <!-- <el-switch v-else v-model="scope.row.status" /> -->
+              <!-- <el-tag v-if="scope.row.roles === 'admin'" effect="plain">admin</el-tag>
+              <el-tag v-else type="warning" effect="plain">{{ scope.row.roles }}</el-tag> -->
             </template>
           </el-table-column>
           <!--
@@ -250,87 +326,121 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
       <el-form ref="formRef" :model="formData" :rules="formRules" label-width="100px" label-position="left">
         <el-row :gutter="20">
           <el-col :span="12">
-            <el-form-item prop="code" label="账号">
-              <el-input v-model="formData.username" placeholder="请输入" /> </el-form-item
+            <el-form-item prop="userId" label="账号">
+              <el-input v-model="formData.userId" placeholder="请输入" /> </el-form-item
           ></el-col>
           <el-col :span="12">
+            <el-form-item prop="userName" label="姓名">
+              <el-input v-model="formData.userName" placeholder="请输入" /> </el-form-item
+          ></el-col>
+          <!-- <el-col :span="12">
             <el-form-item prop="name" label="用户类型" v-if="currentUpdateId === undefined">
               <el-input v-model="formData.password" placeholder="请输入" /> </el-form-item
-          ></el-col>
+          ></el-col> -->
         </el-row>
         <el-row :gutter="20">
           <el-col :span="12">
-            <el-form-item prop="code" label="姓名">
-              <el-input v-model="formData.username" placeholder="请输入" /> </el-form-item
+            <el-form-item prop="phone" label="手机号" v-if="currentUpdateId === undefined">
+              <el-input v-model="formData.phone" placeholder="请输入" /> </el-form-item
           ></el-col>
+
           <el-col :span="12">
-            <el-form-item prop="name" label="手机号" v-if="currentUpdateId === undefined">
+            <el-form-item prop="password" label="登录密码" v-if="currentUpdateId === undefined">
               <el-input v-model="formData.password" placeholder="请输入" /> </el-form-item
           ></el-col>
         </el-row>
         <el-row :gutter="20">
           <el-col :span="12">
-            <el-form-item prop="code" label="性别">
-              <el-input v-model="formData.username" placeholder="请输入" /> </el-form-item
-          ></el-col>
-          <el-col :span="12">
-            <el-form-item prop="name" label="出生日期" v-if="currentUpdateId === undefined">
-              <el-input v-model="formData.password" placeholder="请输入" /> </el-form-item
-          ></el-col>
-        </el-row>
-        <el-row :gutter="20">
-          <el-col :span="12">
-            <el-form-item prop="isfree" label="角色">
-              <el-radio-group v-model="formData.isfree">
-                <el-radio value="true">是</el-radio>
-                <el-radio value="false">否</el-radio>
-              </el-radio-group>
+            <el-form-item prop="gender" label="性别">
+              <el-select v-model="formData.gender" placeholder="性别" clearable>
+                <el-option label="男" value="1" />
+                <el-option label="女" value="2" />
+              </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item prop="person" label="身份证号" v-if="currentUpdateId === undefined">
+            <el-form-item prop="birthday" label="出生日期">
+              <!-- <el-input v-model="formData.password" placeholder="请输入" />  -->
               <el-date-picker
-                v-model="formData.date"
-                type="daterange"
-                range-separator="To"
-                start-placeholder="考试开始时间"
-                end-placeholder="考试结束时间"
+                v-model="formData.birthday"
+                type="date"
+                placeholder="出生日期"
+                format="YYYY/MM/DD"
+                value-format="YYYY-MM-DD"
               />
             </el-form-item>
           </el-col>
         </el-row>
         <el-row :gutter="20">
           <el-col :span="12">
+            <el-form-item prop="userRoleList" label="角色">
+              <el-select v-model="formData.userRoleList" placeholder="角色" multiple clearable>
+                <el-option
+                  v-for="item in optionsType"
+                  :key="item.roleCode"
+                  :label="item.roleName"
+                  :value="item.roleCode"
+                >
+                </el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item prop="idCard" label="身份证号" v-if="currentUpdateId === undefined">
+              <!-- <el-date-picker
+                v-model="formData.date"
+                type="daterange"
+                range-separator="To"
+                start-placeholder="考试开始时间"
+                end-placeholder="考试结束时间"
+              /> -->
+              <el-input v-model="formData.idCard" placeholder="请输入" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <!-- <el-col :span="12">
             <el-form-item prop="code" label="机构">
               <el-input v-model="formData.username" placeholder="请输入" /> </el-form-item
-          ></el-col>
-          <el-col :span="12">
-            <el-form-item prop="name" label="登录密码" v-if="currentUpdateId === undefined">
-              <el-input v-model="formData.password" placeholder="请输入" /> </el-form-item
-          ></el-col>
+          ></el-col> -->
         </el-row>
 
         <el-row :gutter="20">
-          <el-col :span="12">
+          <!-- <el-col :span="12">
             <el-form-item prop="statue" label="分组">
               <el-radio-group v-model="formData.isfree">
                 <el-radio value="true">上架</el-radio>
                 <el-radio value="false">下架</el-radio>
               </el-radio-group>
             </el-form-item>
-          </el-col>
+          </el-col> -->
           <el-col :span="12">
-            <el-form-item label="用户头像:" prop="pic">
+            <el-form-item label="用户头像:" prop="imagePath">
               <!-- //pic为了验证图片是必传的 -->
-              <el-input v-model="formData.pic" style="height: 0px; width: 0px"></el-input>
-              <!-- // :filesData="item.ufjList" 如果有回显，把获取的图片对象传给图片组件 -->
-              <upload-img @updateFileList="updateFiles"></upload-img>
+              <el-input v-model="formData.imagePath" style="height: 0px; width: 0px; visibility: hidden"></el-input>
+              <!-- <upload-img @updateFileList="updateFiles"></upload-img> -->
+
+              <el-upload
+                class="avatar-uploader"
+                :action="VITE_BASE_API"
+                :show-file-list="false"
+                :on-success="handleAvatarSuccess"
+              >
+                <img v-if="imageUrl" :src="imageUrl" class="avatar" />
+                <!-- <i v-else class="el-icon-plus avatar-uploader-icon"></i> -->
+                <el-icon v-else class="avatar-uploader-icon">
+                  <Plus />
+                </el-icon>
+                <!-- <i class="el-icon-upload"></i>
+                <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+                <div class="el-upload__tip" slot="tip">只能上传jpg/png文件，且不超过500kb</div> -->
+              </el-upload>
             </el-form-item>
           </el-col>
         </el-row>
 
         <el-form-item label="个人简介">
-          <el-input v-model="formData.desc" type="textarea" />
+          <el-input v-model="formData.intro" type="textarea" />
         </el-form-item>
       </el-form>
       <template #footer>

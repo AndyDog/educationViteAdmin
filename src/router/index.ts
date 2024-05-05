@@ -262,7 +262,7 @@ export const constantRoutes = [
       },
       {
         path: "role-manage",
-        component: () => import("@/views/system/public-notice/index.vue"),
+        component: () => import("@/views/system/role-manage/index.vue"),
         name: "roleManage",
         meta: {
           title: "角色管理",
