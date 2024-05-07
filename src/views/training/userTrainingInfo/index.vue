@@ -11,6 +11,7 @@ import {
   deleteUserTraining,
   updateUserTraining
 } from "@/api/table"
+import { usergetByUserLike } from "@/api/user"
 import { type IGetTableData } from "@/api/table/types/table"
 import { type FormInstance, type FormRules, ElMessage, ElMessageBox } from "element-plus"
 import { Search, Refresh, CirclePlus, Delete, Download, RefreshRight } from "@element-plus/icons-vue"
@@ -22,7 +23,11 @@ defineOptions({
 
 const loading = ref<boolean>(false)
 const { paginationData, handleCurrentChange, handleSizeChange } = usePagination()
-
+const {
+  paginationData: paginationDatauser,
+  handleCurrentChange: handleCurrentChangeuser,
+  handleSizeChange: handleSizeChangeuser
+} = usePagination()
 //#region 增
 const dialogVisible = ref<boolean>(false)
 const formRef = ref<FormInstance | null>(null)
@@ -37,6 +42,8 @@ const formRules: FormRules = reactive({
 })
 
 let optionstraining = ref([])
+
+let optionsUser = ref([])
 
 const handleCreate = () => {
   formRef.value?.validate((valid: boolean) => {
@@ -102,7 +109,7 @@ const handleUpdate = (row: IGetTableData) => {
 const tableData = ref<IGetTableData[]>([])
 const searchFormRef = ref<FormInstance | null>(null)
 const searchData = reactive({
-  userTrainingId: "",
+  trainingId: "",
   userId: ""
 })
 const getTableData = () => {
@@ -110,8 +117,8 @@ const getTableData = () => {
   getUserTraining({
     page: paginationData.currentPage,
     size: paginationData.pageSize,
-    userId: formData.userId || undefined,
-    userTrainingId: formData.userTrainingId || undefined
+    userId: searchData.userId || undefined,
+    trainingId: searchData.trainingId || undefined
   })
     .then((res) => {
       // paginationData.total = res.data.total
@@ -154,10 +161,35 @@ const getqueryInfomationList = () => {
     console.log(optionstraining)
   })
 }
+// 获取用户信息下拉列表
+const getusergetByUserLike = () => {
+  loading.value = true
+  usergetByUserLike({
+    page: paginationDatauser.currentPage,
+    size: paginationDatauser.pageSize
+  })
+    .then((res) => {
+      paginationDatauser.total = res?.datas?.length
+      optionsUser.value = res?.datas
+      // let result = res?.datas
+      // optionsUser.value = result.map((item) => {
+      //   let obj = item
+      //   obj.statusFilter = obj.status == 1 ? true : false
+      //   return obj
+      // })
+    })
+    .catch(() => {
+      tableData.value = []
+    })
+    .finally(() => {
+      loading.value = false
+    })
+}
 
 //#endregion
 onMounted(() => {
   getqueryInfomationList()
+  getusergetByUserLike()
   // getTableData()
 })
 
@@ -170,7 +202,7 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
     <el-card v-loading="loading" shadow="never" class="search-wrapper">
       <el-form ref="searchFormRef" :inline="true" :model="searchData">
         <el-form-item prop="trainingId" label="培训">
-          <el-select style="width: 150px" v-model="searchData.trainingId" placeholder="请选择">
+          <el-select style="width: 150px" clearable v-model="searchData.trainingId" placeholder="请选择">
             <div class="customselect">
               <el-row :gutter="20">
                 <el-col :span="12"> <span>培训代码</span></el-col>
@@ -179,9 +211,9 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
             </div>
             <el-option
               v-for="item in optionstraining"
-              :key="item.trainingCode"
+              :key="item.trainingId"
               :label="item.trainingName"
-              :value="item.trainingCode"
+              :value="item.trainingId"
             >
               <el-row :gutter="20">
                 <el-col :span="12">
@@ -193,12 +225,30 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
               </el-row>
             </el-option>
           </el-select>
-
           <!-- <SelectTable v-model:data="searchData.trainingId" :fields="fields" :tableData="optionstraining" :label="label"
             :objKey="objKey" :border="true"></SelectTable> -->
         </el-form-item>
-        <el-form-item prop="phone" label="用户">
-          <el-input v-model="searchData.userId" placeholder="请输入" />
+        <el-form-item prop="userId" label="用户">
+          <!-- <el-input v-model="searchData.userId" placeholder="请输入" /> -->
+
+          <el-select style="width: 150px" clearable v-model="searchData.userId" placeholder="请选择">
+            <div class="customselect">
+              <el-row :gutter="20">
+                <el-col :span="12"> <span>用户</span></el-col>
+                <el-col :span="12"> <span>角色</span></el-col>
+              </el-row>
+            </div>
+            <el-option v-for="item in optionsUser" :key="item.userId" :label="item.userName" :value="item.userId">
+              <el-row :gutter="20">
+                <el-col :span="12">
+                  <span>{{ item.userName }}</span></el-col
+                >
+                <el-col :span="12">
+                  <span> {{ item?.userRoleList?.[0]?.roleName }}</span></el-col
+                >
+              </el-row>
+            </el-option>
+          </el-select>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" :icon="Search" @click="handleSearch">查询</el-button>
@@ -317,5 +367,19 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
 .pager-wrapper {
   display: flex;
   justify-content: flex-end;
+}
+.customselect {
+  box-sizing: border-box;
+  color: var(--el-text-color-regular);
+  cursor: pointer;
+  font-size: var(--el-font-size-base);
+  height: 34px;
+  line-height: 34px;
+  overflow: hidden;
+  padding: 0 32px 0 20px;
+  position: relative;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 600;
 }
 </style>

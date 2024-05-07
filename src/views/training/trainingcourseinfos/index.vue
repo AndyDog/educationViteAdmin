@@ -144,6 +144,7 @@ const searchData = reactive({
   manager: "", //负责人
   scoreRatio: "", //学习成绩占比
   trainingCourseId: "", //培训课程信息ID
+  courseId: "",
   updateTime: "" //更新时间
 })
 const getTableData = () => {
@@ -221,7 +222,7 @@ const getqueryCourseListApi = () => {
       optionscourseType.value = res?.datas
     })
     .catch(() => {
-      tableData.value = []
+      optionscourseType.value = []
     })
     .finally(() => {
       loading.value = false

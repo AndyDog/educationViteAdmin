@@ -279,3 +279,12 @@ export function updateUserTraining(data: any) {
     data
   })
 }
+
+/** 用户课表-获取列表*/
+export function getUserTrainingDetail(data: any) {
+  return request({
+    url: "/training/getUserTrainingDetail",
+    method: "post",
+    data
+  })
+}
