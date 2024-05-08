@@ -53,7 +53,7 @@ const handleCreate = () => {
         let obj = {}
         obj = optionsType.value.filter((itemm) => {
           return itemm.roleCode == item
-        })
+        })[0]
         return obj
       })
 
