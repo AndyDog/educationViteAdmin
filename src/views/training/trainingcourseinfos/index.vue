@@ -9,6 +9,7 @@ import {
   queryDictionariesDetailLike,
   queryCourseListApi
 } from "@/api/table"
+import { usergetByUserLike } from "@/api/user"
 import { type IGetTableData } from "@/api/table/types/table"
 import { type FormInstance, type FormRules, ElMessage, ElMessageBox } from "element-plus"
 import { Search, Refresh, CirclePlus, Delete, Download, RefreshRight } from "@element-plus/icons-vue"
@@ -22,7 +23,11 @@ defineOptions({
 
 const loading = ref<boolean>(false)
 const { paginationData, handleCurrentChange, handleSizeChange } = usePagination()
-
+const {
+  paginationData: paginationDatauser,
+  handleCurrentChange: handleCurrentChangeuser,
+  handleSizeChange: handleSizeChangeuser
+} = usePagination()
 //#region 增
 const dialogVisible = ref<boolean>(false)
 const formRef = ref<FormInstance | null>(null)
@@ -55,7 +60,7 @@ let optionstraining = ref([])
 let optionsType = ref([])
 
 let optionscourseType = ref([])
-
+let optionsUser = ref([])
 const handleCreate = () => {
   formRef.value?.validate((valid: boolean) => {
     if (valid) {
@@ -150,7 +155,7 @@ const searchData = reactive({
 const getTableData = () => {
   loading.value = true
   getTrainingCourse({
-    currentPage: paginationData.currentPage,
+    page: paginationData.currentPage,
     size: paginationData.pageSize
   })
     .then((res: any) => {
@@ -186,7 +191,7 @@ const handleRefresh = () => {
 const getqueryInfomationList = () => {
   // loading.value = true
   queryInfomationList({
-    currentPage: 1,
+    page: 1,
     size: 99999
   }).then((res: any) => {
     console.log(res)
@@ -197,7 +202,7 @@ const getqueryInfomationList = () => {
 
 const getTableDataDetail = () => {
   queryDictionariesDetailLike({
-    currentPage: 1,
+    page: 1,
     size: 100000,
     parentCode: "course_classification",
     type: 1
@@ -229,11 +234,37 @@ const getqueryCourseListApi = () => {
     })
 }
 
+// 获取用户信息下拉列表
+const getusergetByUserLike = () => {
+  loading.value = true
+  usergetByUserLike({
+    page: paginationDatauser.currentPage,
+    size: paginationDatauser.pageSize
+  })
+    .then((res) => {
+      paginationDatauser.total = res?.datas?.length
+      optionsUser.value = res?.datas
+      // let result = res?.datas
+      // optionsUser.value = result.map((item) => {
+      //   let obj = item
+      //   obj.statusFilter = obj.status == 1 ? true : false
+      //   return obj
+      // })
+    })
+    .catch(() => {
+      tableData.value = []
+    })
+    .finally(() => {
+      loading.value = false
+    })
+}
+
 onMounted(() => {
   // 初始化执行的事件
   getqueryInfomationList()
   getTableDataDetail()
   getqueryCourseListApi()
+  getusergetByUserLike()
   // 例如，可以在这里发起API请求或者进行其他初始化工作
 })
 
@@ -278,7 +309,7 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
         <el-form-item prop="dictId" label="分类">
           <!-- {{ optionsType }} -->
           <el-select style="width: 150px" v-model="searchData.dictId" placeholder="请选择">
-            <el-option v-for="item in optionsType" :key="item.dictCode" :label="item.dictName" :value="item.dictCode">
+            <el-option v-for="item in optionsType" :key="item.dictCode" :label="item.dictName" :value="item.dictId">
             </el-option>
           </el-select>
         </el-form-item>
@@ -294,9 +325,9 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
             </div>
             <el-option
               v-for="item in optionscourseType"
-              :key="item.courseCode"
+              :key="item.courseId"
               :label="item.courseName"
-              :value="item.courseCode"
+              :value="item.courseId"
             >
               <el-row :gutter="20">
                 <el-col :span="8">
@@ -390,9 +421,9 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
             </div>
             <el-option
               v-for="item in optionstraining"
-              :key="item.trainingCode"
+              :key="item.trainingId"
               :label="item.trainingName"
-              :value="item.trainingCode"
+              :value="item.trainingId"
             >
               <el-row :gutter="20">
                 <el-col :span="12">
@@ -410,7 +441,7 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
         <el-form-item prop="dictId" label="分类">
           <!-- {{ optionsType }} -->
           <el-select v-model="formData.dictId" placeholder="请选择">
-            <el-option v-for="item in optionsType" :key="item.dictCode" :label="item.dictName" :value="item.dictCode">
+            <el-option v-for="item in optionsType" :key="item.dictId" :label="item.dictName" :value="item.dictId">
             </el-option>
           </el-select>
         </el-form-item>
@@ -426,9 +457,9 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
             </div>
             <el-option
               v-for="item in optionscourseType"
-              :key="item.courseCode"
+              :key="item.courseId"
               :label="item.courseName"
-              :value="item.courseCode"
+              :value="item.courseId"
             >
               <el-row :gutter="20">
                 <el-col :span="8">
@@ -446,9 +477,28 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
         </el-form-item>
 
         <el-form-item prop="manager" label="负责人">
-          <el-select v-model="formData.manager" placeholder="Activity zone">
+          <!-- <el-select v-model="formData.manager" placeholder="Activity zone">
             <el-option label="Zone one" value="shanghai" />
             <el-option label="Zone two" value="beijing" />
+          </el-select> -->
+
+          <el-select style="width: 150px" clearable v-model="formData.manager" placeholder="请选择">
+            <div class="customselect">
+              <el-row :gutter="20">
+                <el-col :span="12"> <span>用户</span></el-col>
+                <el-col :span="12"> <span>角色</span></el-col>
+              </el-row>
+            </div>
+            <el-option v-for="item in optionsUser" :key="item.userId" :label="item.userName" :value="item.userId">
+              <el-row :gutter="20">
+                <el-col :span="12">
+                  <span>{{ item.userName }}</span></el-col
+                >
+                <el-col :span="12">
+                  <span> {{ item?.userRoleList?.[0]?.roleName }}</span></el-col
+                >
+              </el-row>
+            </el-option>
           </el-select>
         </el-form-item>
 

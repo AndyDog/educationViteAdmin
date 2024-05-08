@@ -34,7 +34,8 @@ const formRef = ref<FormInstance | null>(null)
 const formData = reactive({
   userTrainingId: "",
   userId: "",
-  trainingId: ""
+  trainingId: "",
+  trainingName: ""
 })
 const formRules: FormRules = reactive({
   userTrainingId: [{ required: true, trigger: "blur", message: "请选择用户" }],
@@ -49,10 +50,15 @@ const handleCreate = () => {
   formRef.value?.validate((valid: boolean) => {
     if (valid) {
       if (currentUpdateId.value === undefined) {
+        const activetrain = optionstraining.value.filter((item: any) => {
+          return item.trainingId == formData.trainingId
+        })
+
         addUserTraining({
-          userTrainingId: formData.userTrainingId,
-          // userId: formData.userId,
-          trainingId: formData.trainingId
+          // userTrainingId: formData.userTrainingId,
+          userId: formData.userId,
+          trainingId: formData.trainingId,
+          trainingName: activetrain?.[0]?.trainingName ?? ""
         }).then(() => {
           ElMessage.success("新增成功")
           dialogVisible.value = false
@@ -61,8 +67,9 @@ const handleCreate = () => {
       } else {
         updateUserTraining({
           id: currentUpdateId.value,
-          userTrainingId: formData.userTrainingId,
-          userId: formData.userId
+          trainingId: formData.trainingId,
+          userId: formData.userId,
+          trainingName: activetrain?.[0]?.trainingName ?? ""
         }).then(() => {
           ElMessage.success("修改成功")
           dialogVisible.value = false
@@ -230,7 +237,6 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
         </el-form-item>
         <el-form-item prop="userId" label="用户">
           <!-- <el-input v-model="searchData.userId" placeholder="请输入" /> -->
-
           <el-select style="width: 150px" clearable v-model="searchData.userId" placeholder="请选择">
             <div class="customselect">
               <el-row :gutter="20">
@@ -318,7 +324,7 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
               v-for="item in optionstraining"
               :key="item.trainingCode"
               :label="item.trainingName"
-              :value="item.trainingCode"
+              :value="item.trainingId"
             >
               <el-row :gutter="20">
                 <el-col :span="12">
@@ -332,9 +338,28 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
           </el-select>
         </el-form-item>
         <el-form-item prop="password" label="用户">
-          <el-select v-model="formData.userId" placeholder="Activity zone">
+          <!-- <el-select v-model="formData.userId" placeholder="Activity zone">
             <el-option label="Zone one" value="shanghai" />
             <el-option label="Zone two" value="beijing" />
+          </el-select> -->
+
+          <el-select style="width: 150px" clearable v-model="formData.userId" placeholder="请选择">
+            <div class="customselect">
+              <el-row :gutter="20">
+                <el-col :span="12"> <span>用户</span></el-col>
+                <el-col :span="12"> <span>角色</span></el-col>
+              </el-row>
+            </div>
+            <el-option v-for="item in optionsUser" :key="item.userId" :label="item.userName" :value="item.userId">
+              <el-row :gutter="20">
+                <el-col :span="12">
+                  <span>{{ item.userName }}</span></el-col
+                >
+                <el-col :span="12">
+                  <span> {{ item?.userRoleList?.[0]?.roleName }}</span></el-col
+                >
+              </el-row>
+            </el-option>
           </el-select>
         </el-form-item>
       </el-form>

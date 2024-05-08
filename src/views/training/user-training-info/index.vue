@@ -12,7 +12,11 @@ defineOptions({
 
 const loading = ref<boolean>(false)
 const { paginationData, handleCurrentChange, handleSizeChange } = usePagination()
-
+const {
+  paginationData: paginationDatauser,
+  handleCurrentChange: handleCurrentChangeuser,
+  handleSizeChange: handleSizeChangeuser
+} = usePagination()
 //#region 增
 const dialogVisible = ref<boolean>(false)
 const formRef = ref<FormInstance | null>(null)

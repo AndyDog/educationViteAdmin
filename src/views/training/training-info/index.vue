@@ -421,9 +421,25 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
             </el-form-item>
           </el-col>
         </el-row>
-        <el-form-item prop="studyHoursLength" label="学时长度(秒):">
-          <el-input-number v-model="formData.studyHoursLength" :min="1" :max="1000" label="学时长度"></el-input-number>
-        </el-form-item>
+
+        <el-row :gutter="20">
+          <el-col :span="12">
+            <el-form-item prop="studyHoursLength" label="学时长度(秒):">
+              <el-input-number
+                v-model="formData.studyHoursLength"
+                :min="1"
+                :max="1000"
+                label="学时长度"
+              ></el-input-number>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item v-if="formData.isFree == 2" prop="price" label="价格">
+              <el-input-number v-model="formData.price" :min="1" :max="100000000000000" label="价格"></el-input-number>
+            </el-form-item>
+          </el-col>
+        </el-row>
+
         <el-form-item prop="introduction" label="培训简介">
           <Editor v-model="formData.introduction"></Editor>
           <!-- <el-input v-model="formData.password" placeholder="请输入" /> -->

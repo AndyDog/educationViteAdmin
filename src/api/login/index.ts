@@ -11,7 +11,8 @@ export function getLoginCodeApi() {
 
 /** 登录并返回 Token */
 export function loginApi(data: any) {
-  return request<Login.LoginResponseData>({
+  console.log(data)
+  return request({
     url: "user/login",
     method: "post",
     data
