@@ -31,7 +31,7 @@ const formData = reactive({
   roleIds: "",
   status: "",
   updateTime: "",
-  userId: "",
+  // userId: "",
   userName: "",
   userRoleList: []
 })
@@ -39,10 +39,10 @@ const formData = reactive({
 let imageUrl = ref<any>("")
 
 const formRules: FormRules = reactive({
-  userId: [{ required: true, trigger: "blur", message: "请输入账号" }],
+  loginName: [{ required: true, trigger: "blur", message: "请输入账号" }],
   userName: [{ required: true, trigger: "blur", message: "请输入姓名" }],
-  userRoleList: [{ required: true, trigger: "blur", message: "请输入角色" }],
-  password: [{ required: true, trigger: "blur", message: "请输入登陆密码" }]
+  userRoleList: [{ required: true, trigger: "blur", message: "请输入角色" }]
+  // password: [{ required: true, trigger: "blur", message: "请输入登陆密码" }]
 })
 const handleCreate = () => {
   formRef.value?.validate((valid: boolean) => {
@@ -91,7 +91,7 @@ const resetForm = () => {
   formData.roleIds = ""
   formData.status = ""
   formData.updateTime = ""
-  formData.userId = ""
+  // formData.userId = ""
   formData.userName = ""
   formData.userRoleList = []
 }
@@ -125,7 +125,7 @@ const handleUpdate = (row: IGetTableData) => {
 const tableData = ref<IGetTableData[]>([])
 const searchFormRef = ref<FormInstance | null>(null)
 const searchData = reactive({
-  userId: "",
+  loginName: "",
   userName: "",
   phone: "",
   idCard: "",
@@ -137,7 +137,7 @@ const getTableData = () => {
   usergetByUserLike({
     page: paginationData.currentPage,
     size: paginationData.pageSize,
-    userId: searchData.userId || undefined,
+    loginName: searchData.loginName || undefined,
     userName: searchData.userName || undefined,
     phone: searchData.phone || undefined,
     idCard: searchData.idCard || undefined,
@@ -213,14 +213,14 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
   <div class="app-container">
     <el-card v-loading="loading" shadow="never" class="search-wrapper">
       <el-form ref="searchFormRef" :inline="true" :model="searchData">
-        <el-form-item prop="username" label="账号">
-          <el-input v-model="searchData.username" placeholder="请输入" />
+        <el-form-item prop="loginName" label="账号">
+          <el-input v-model="searchData.loginName" placeholder="请输入" />
         </el-form-item>
         <!-- <el-form-item prop="phone" label="用户类型">
           <el-input v-model="searchData.phone" placeholder="请输入" />
         </el-form-item> -->
-        <el-form-item prop="phone" label="姓名">
-          <el-input v-model="searchData.phone" placeholder="请输入" />
+        <el-form-item prop="userName" label="姓名">
+          <el-input v-model="searchData.userName" placeholder="请输入" />
         </el-form-item>
         <el-form-item prop="phone" label="手机号">
           <el-input v-model="searchData.phone" placeholder="请输入" />
@@ -234,8 +234,8 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
         <!-- <el-form-item prop="phone" label="角色">
           <el-input v-model="searchData.phone" placeholder="请输入" />
         </el-form-item> -->
-        <el-form-item prop="phone" label="身份证号">
-          <el-input v-model="searchData.phone" placeholder="请输入" />
+        <el-form-item prop=" idCard" label="身份证号">
+          <el-input v-model="searchData.idCard" placeholder="请输入" />
         </el-form-item>
         <!-- <el-form-item prop="phone" label="机构">
           <el-input v-model="searchData.phone" placeholder="请输入" />
@@ -264,9 +264,9 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
       <div class="table-wrapper">
         <el-table :data="tableData">
           <el-table-column type="selection" width="50" align="center" />
-          <el-table-column prop="userName" label="账号" align="center" />
+          <el-table-column prop=" loginName" label="账号" align="center" />
           <el-table-column prop="phone" label="手机号" align="center" />
-          <el-table-column prop="loginName" label="姓名" align="center" />
+          <el-table-column prop="userName" label="姓名" align="center" />
           <el-table-column prop="idCard" label="身份证号" align="center" />
           <el-table-column prop="createTime" label="角色" align="center">
             <template #default="scope">
@@ -326,8 +326,8 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
       <el-form ref="formRef" :model="formData" :rules="formRules" label-width="100px" label-position="left">
         <el-row :gutter="20">
           <el-col :span="12">
-            <el-form-item prop="userId" label="账号">
-              <el-input v-model="formData.userId" placeholder="请输入" /> </el-form-item
+            <el-form-item prop="loginName" label="账号">
+              <el-input v-model="formData.loginName" placeholder="请输入" /> </el-form-item
           ></el-col>
           <el-col :span="12">
             <el-form-item prop="userName" label="姓名">
