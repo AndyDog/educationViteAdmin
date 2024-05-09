@@ -58,7 +58,7 @@ const handleCreate = () => {
           // userTrainingId: formData.userTrainingId,
           userId: formData.userId,
           trainingId: formData.trainingId,
-          trainingName: activetrain?.[0]?.trainingName ?? ""
+          trainingName: activetrain?.[0]?.trainingName
         }).then(() => {
           ElMessage.success("新增成功")
           dialogVisible.value = false
@@ -69,7 +69,7 @@ const handleCreate = () => {
           id: currentUpdateId.value,
           trainingId: formData.trainingId,
           userId: formData.userId,
-          trainingName: activetrain?.[0]?.trainingName ?? ""
+          trainingName: activetrain?.[0]?.trainingName
         }).then(() => {
           ElMessage.success("修改成功")
           dialogVisible.value = false

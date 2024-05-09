@@ -78,20 +78,6 @@
     "vue-eslint-parser": "^9.1.1",
     "vue-tsc": "^1.2.0"
   },
-  "lint-staged": {
-    "*.{js,jsx,vue,ts,tsx}": [
-      "prettier --write"
-    ],
-    "*.{scss,less,css,html,md}": [
-      "prettier --write"
-    ],
-    "package.json": [
-      "prettier --write"
-    ],
-    "{!(package)*.json,.!(browserslist)*rc}": [
-      "prettier --write--parser json"
-    ]
-  },
   "keywords": [
     "vue",
     "vue3",

@@ -13,7 +13,7 @@ import {
   addDictionaiesDetail
 } from "@/api/table"
 
-import { usergetRole, usergetRoleUser } from "@/api/user"
+import { usergetRole, usergetRoleUser, useraddRole, userdeleteRole, userupdateRole } from "@/api/user"
 
 import { type IGetTableData } from "@/api/table/types/table"
 import { type FormInstance, type FormRules, ElMessage, ElMessageBox } from "element-plus"
@@ -83,9 +83,9 @@ const formRules: FormRules = reactive({
   dictName: [{ required: true, trigger: "blur", message: "字典名称" }]
 })
 const formRulesDetail: FormRules = reactive({
-  dicNumber: [{ required: true, trigger: "blur", message: "请输入排序号" }],
-  dictCode: [{ required: true, trigger: "blur", message: "请输入字典值" }],
-  dictName: [{ required: true, trigger: "blur", message: "字典名称" }]
+  loginName: [{ required: true, trigger: "blur", message: "请输入账号" }],
+  userName: [{ required: true, trigger: "blur", message: "请输入姓名" }],
+  userRoleList: [{ required: true, trigger: "blur", message: "请输入角色" }]
 })
 
 const currentRow = ref()
@@ -102,7 +102,7 @@ const handleCreate = () => {
   formRef.value?.validate((valid: boolean) => {
     if (valid) {
       if (currentUpdateId.value === undefined) {
-        addDictionaries(formData).then(() => {
+        useraddRole(formData).then(() => {
           ElMessage.success("新增成功")
           dialogVisible.value = false
           getTableData()
@@ -110,7 +110,7 @@ const handleCreate = () => {
       } else {
         let formDatatemp = JSON.parse(JSON.stringify(formData))
         // formDatatemp.dictId = 2
-        updataDictionaries(formDatatemp).then(() => {
+        userupdateRole(formDatatemp).then(() => {
           ElMessage.success("修改成功")
           dialogVisible.value = false
           getTableData()
@@ -123,30 +123,29 @@ const handleCreate = () => {
 }
 
 const handleCreateDetail = () => {
-  formRefDetail.value?.validate((valid: boolean) => {
+  formRef.value?.validate((valid: boolean) => {
     if (valid) {
-      if (currentUpdateIdDetail.value === undefined) {
-        // let formDatatemp = JSON.parse(JSON.stringify(formData))
-        let param = {
-          dicNumber: formDataDetail.dicNumber,
-          dictCode: formDataDetail.dictCode,
-          // "dictId": formDataDetail.dictCode,
-          dictName: formDataDetail.dictName,
-          dictRemark: formDataDetail.dictRemark,
-          parentId: currentRow.value.dictId
-        }
-        addDictionaiesDetail(param).then(() => {
+      let param = JSON.parse(JSON.stringify(formData))
+      //
+      param.userRoleList = param.userRoleList.map((item) => {
+        let obj = {}
+        obj = optionsType.value.filter((itemm) => {
+          return itemm.roleCode == item
+        })[0]
+        return obj
+      })
+
+      if (currentUpdateId.value === undefined) {
+        useraddUser(param).then(() => {
           ElMessage.success("新增成功")
-          dialogVisibleDetail.value = false
-          getTableDataDetail()
+          dialogVisible.value = false
+          getTableData()
         })
       } else {
-        let formDatatemp = JSON.parse(JSON.stringify(formData))
-        formDatatemp.type = 2
-        updateDictionariesDetail(formDatatemp).then(() => {
+        userupdateUser(formData).then(() => {
           ElMessage.success("修改成功")
-          dialogVisibleDetail.value = false
-          getTableDataDetail()
+          dialogVisible.value = false
+          getTableData()
         })
       }
     } else {
@@ -168,18 +167,25 @@ const resetForm = () => {
 }
 
 const resetFormDetail = () => {
-  currentUpdateIdDetail.value = undefined
-  // formData.code = ""
-  // formData.name = ""
-  formDataDetail.dicNumber = ""
-  formDataDetail.dictCode = ""
-  formDataDetail.dictId = ""
-  formDataDetail.dictName = ""
-  formDataDetail.dictRemark = ""
-  formDataDetail.insertTime = ""
-  formDataDetail.updateTime = ""
-}
+  currentUpdateId.value = undefined
+  formData.birthday = ""
+  formData.email = ""
+  formData.gender = ""
+  formData.id = 0
+  formData.imagePath = ""
+  formData.insertTime = ""
+  formData.intro = ""
+  formData.loginName = ""
+  formData.password = ""
 
+  formData.phone = ""
+  formData.roleIds = ""
+  formData.status = ""
+  formData.updateTime = ""
+  // formData.userId = ""
+  formData.userName = ""
+  formData.userRoleList = []
+}
 //#endregion
 //#region 删
 const handleDelete = (row: any) => {
@@ -188,46 +194,28 @@ const handleDelete = (row: any) => {
     cancelButtonText: "取消",
     type: "warning"
   }).then(() => {
-    let obj = {}
+    let obj = { roleCode: row.roleCode, roleId: row.roleId }
     // obj.imageKeys = [row.imageKey]
     // obj.type = 2
-    deleteDictionaries(obj).then(() => {
+    userdeleteRole(obj).then(() => {
       ElMessage.success("删除成功")
       getTableData()
     })
   })
 }
 
-const handleDeleteDetail = (row: any) => {
-  ElMessageBox.confirm(`正在删除：${row.dictName}，确认删除？`, "提示", {
+const handleDeleteDetail = (row: IGetTableData) => {
+  ElMessageBox.confirm(`正在删除用户：${row.userName}，确认删除？`, "提示", {
     confirmButtonText: "确定",
     cancelButtonText: "取消",
     type: "warning"
   }).then(() => {
-    let obj = {}
-    // obj.dictCode = row.dictCode
-    // obj.dictId = row.dictId
-    obj.dictIds = [row.dictId]
-    // obj.parentId = [row.parentId]
-    // obj.type = 0
-
-    // {
-    // 	"dictCode": "",
-    // 	"dictId": "",
-    // 	"dictIds": [],
-    // 	"keyWord": "",
-    // 	"page": 0,
-    // 	"parentId": "",
-    // 	"size": 0,
-    // 	"type": 0
-    // }
-    deleteDictionariesDetail(obj).then(() => {
+    userdeleteUser(row.userId).then(() => {
       ElMessage.success("删除成功")
       getTableDataDetail()
     })
   })
 }
-
 //#endregion
 
 //#region 改
@@ -250,14 +238,15 @@ const handleUpdate = (row: any) => {
 const handleUpdateDetail = (row: any) => {
   currentUpdateIdDetail.value = row.id
 
-  formData.dicNumber = row.introduction
-  formData.dictCode = row.studyHours
-  formData.dictId = row.dictId
-  formData.dictName = row.dictName
-  formData.dictRemark = row.dictRemark
-  formData.insertTime = row.insertTime
-  formData.updateTime = row.updateTime
-
+  // formDataDetail.dicNumber = row.introduction
+  // formDataDetail.dictCode = row.studyHours
+  // formDataDetail.dictId = row.dictId
+  // formDataDetail.dictName = row.dictName
+  // formDataDetail.dictRemark = row.dictRemark
+  // formDataDetail.insertTime = row.insertTime
+  // formDataDetail.updateTime = row.updateTime
+  formDataDetail.userName = row.userName
+  formDataDetail.userId = row.userId
   dialogVisibleDetail.value = true
 }
 
@@ -335,7 +324,7 @@ const handleSearch = () => {
 
 const handleSearchDetail = () => {
   if (paginationData1.currentPage === 1) {
-    getTableData()
+    getTableDataDetail()
   }
   paginationData1.currentPage = 1
 }
@@ -351,7 +340,7 @@ const handleRefresh = () => {
   getTableData()
 }
 const handleRefreshDetail = () => {
-  getTableData()
+  getTableDataDetail()
 }
 
 //#endregion
