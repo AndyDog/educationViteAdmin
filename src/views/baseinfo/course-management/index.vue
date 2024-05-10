@@ -10,6 +10,7 @@ import {
   deleteCourse,
   queryDictionariesDetailLike
 } from "@/api/table"
+import { usergetByUserLike } from "@/api/user"
 import { type IGetTableData } from "@/api/table/types/table"
 import { type FormInstance, type FormRules, ElMessage, ElMessageBox } from "element-plus"
 import { Search, Refresh, CirclePlus, Delete, Download, RefreshRight } from "@element-plus/icons-vue"
@@ -22,10 +23,18 @@ defineOptions({
 
 const VITE_BASE_API = ref(import.meta.env.VITE_BASE_API + "user/upLoadImage")
 let optionsType = ref([])
+
+let optionsUser = ref([])
+
+
 // 课程管理
 const loading = ref<boolean>(false)
 const { paginationData, handleCurrentChange, handleSizeChange } = usePagination()
-
+const {
+  paginationData: paginationDatauser,
+  handleCurrentChange: handleCurrentChangeuser,
+  handleSizeChange: handleSizeChangeuser
+} = usePagination()
 //#region 增
 const dialogVisible = ref<boolean>(false)
 const formRef = ref<FormInstance | null>(null)
@@ -85,13 +94,16 @@ const resetForm = () => {
 //#endregion
 
 //#region 删
-const handleDelete = (row: IGetTableData) => {
+const handleDelete = (row: any) => {
   ElMessageBox.confirm(`正在删除用户：${row.username}，确认删除？`, "提示", {
     confirmButtonText: "确定",
     cancelButtonText: "取消",
     type: "warning"
   }).then(() => {
-    deleteCourse(row.id).then(() => {
+    deleteCourse({
+      	"courseId":row.courseId,
+        "courseCode":row.courseCode
+    }).then(() => {
       ElMessage.success("删除成功")
       getTableData()
     })
@@ -189,12 +201,39 @@ const getTableDataDetail = () => {
       optionsType.value = []
     })
 }
+
+
+// 获取用户信息下拉列表
+const getusergetByUserLike = () => {
+  loading.value = true
+  usergetByUserLike({
+    page: paginationDatauser.currentPage,
+    size: paginationDatauser.pageSize
+  })
+    .then((res) => {
+      paginationDatauser.total = res?.datas?.length
+      optionsUser.value = res?.datas
+      // let result = res?.datas
+      // optionsUser.value = result.map((item) => {
+      //   let obj = item
+      //   obj.statusFilter = obj.status == 1 ? true : false
+      //   return obj
+      // })
+    })
+    .catch(() => {
+      tableData.value = []
+    })
+    .finally(() => {
+      loading.value = false
+    })
+}
+
 //#endregion
 
 onMounted(() => {
   // 初始化执行的事件
-
   getTableDataDetail()
+  getusergetByUserLike()
 })
 
 /** 监听分页参数的变化 */
@@ -292,7 +331,6 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
                 <el-option label="理论知识" value="理论知识" />
                 <el-option label="技能训练" value="技能训练" />
               </el-select> -->
-
               <el-select v-model="formData.dictCode" placeholder="请选择">
                 <el-option
                   v-for="item in optionsType"
@@ -305,10 +343,33 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
           ></el-col>
           <el-col :span="12">
             <el-form-item prop="lecturer" label="主讲老师">
-              <el-select v-model="formData.lecturer" placeholder="Activity zone">
+              <!-- <el-select v-model="formData.lecturer" placeholder="Activity zone">
                 <el-option label="Zone one" value="shanghai" />
                 <el-option label="Zone two" value="beijing" />
-              </el-select> </el-form-item
+              </el-select> -->
+              
+              
+        <el-select style="width: 150px" clearable v-model="formData.lecturer" placeholder="请选择">
+            <div class="customselect">
+              <el-row :gutter="20">
+                <el-col :span="12"> <span>用户</span></el-col>
+                <el-col :span="12"> <span>角色</span></el-col>
+              </el-row>
+            </div>
+            <el-option v-for="item in optionsUser" :key="item.userId" :label="item.userName" :value="item.userId">
+              <el-row :gutter="20">
+                <el-col :span="12">
+                  <span>{{ item.userName }}</span></el-col
+                >
+                <el-col :span="12">
+                  <span> {{ item?.userRoleList?.[0]?.roleName }}</span></el-col
+                >
+              </el-row>
+            </el-option>
+          </el-select>
+              
+              
+              </el-form-item
           ></el-col>
         </el-row>
 

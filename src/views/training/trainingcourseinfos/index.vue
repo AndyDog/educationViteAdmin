@@ -204,7 +204,7 @@ const getTableDataDetail = () => {
   queryDictionariesDetailLike({
     page: 1,
     size: 100000,
-    parentCode: "course_classification",
+    parentCode: "course_classification", 
     type: 1
     // username: searchData.username || undefined,
     // phone: searchData.phone || undefined

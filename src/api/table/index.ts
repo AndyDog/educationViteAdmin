@@ -29,20 +29,20 @@ export function updateTableDataApi(data: any) {
 }
 
 /** 查 静态图片 */
-export function getTableDataApi(params: any) {
+export function getTableDataApi(data: any) {
   return request({
     url: "/user/queryImages",
     method: "post",
-    params
+    data
   })
 }
 
 /** 上传图片 静态图片 */
-export function upLoadImageApi(params: any) {
+export function upLoadImageApi(data: any) {
   return request({
     url: "/user/upLoadImage",
     method: "post",
-    params
+    data
   })
 }
 

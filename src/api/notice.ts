@@ -28,10 +28,10 @@ export function announcementupdate(data: any) {
 }
 
 /** 查询公开公告管理列表  */
-export function announcementquery(params: any) {
+export function announcementquery(data: any) {
   return request({
     url: "/announcement/query",
     method: "post",
-    params
+    data
   })
 }

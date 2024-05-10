@@ -21,6 +21,8 @@ export interface IGetTableRequestData {
 }
 
 export interface IGetTableData {
+title: any
+announcementId: string
   createTime: string
   email: string
   id: string

@@ -1,5 +1,14 @@
 <script lang="ts" setup>
-import { reactive, ref, watch } from "vue"
+import { WatchStopHandle, onMounted, reactive, ref, watch } from "vue"
+import {
+  getTrainingCourse,
+  addTrainingCourse,
+  deleteTrainingCourse,
+  updateTrainingCourse,
+  queryInfomationList,
+  queryDictionariesDetailLike,
+  queryCourseListApi
+} from "@/api/table"
 import {
   // createTableDataApi,
   // deleteTableDataApi,
@@ -24,7 +33,7 @@ defineOptions({
 
 const loading = ref<boolean>(false)
 const { paginationData, handleCurrentChange, handleSizeChange } = usePagination()
-
+let optionsType = ref([])
 //#region 增
 const dialogVisible = ref<boolean>(false)
 const formRef = ref<FormInstance | null>(null)
@@ -35,15 +44,15 @@ const formData = reactive({
   state: "", //是否置顶
   title: "", //标题
   txt: "", //内容
-  type: "", //通知类型1-政策文件，2-培训通知，3-资讯动态
-  ImagePath: "", //图片路径
-  fileList: "", //附件
+  dictCode: "", //通知类型1-政策文件，2-培训通知，3-资讯动态
+  imgUrl: "", //图片路径
+  attachUrl: "", //附件
   updateTime: "" //修改时间
 })
 let imageUrl = ref<any>("")
 const formRules: FormRules = reactive({
-  title: [{ required: true, trigger: "blur", message: "请输入用户名" }],
-  type: [{ required: true, trigger: "blur", message: "请输入密码" }]
+  title: [{ required: true, trigger: "blur", message: "请输入标题" }],
+  dictCode: [{ required: true, trigger: "blur", message: "公告类型" }]
 })
 const handleCreate = () => {
   formRef.value?.validate((valid: boolean) => {
@@ -53,7 +62,9 @@ const handleCreate = () => {
           state: "0",
           title: formData.title,
           txt: formData.txt,
-          type: formData.type
+          dictCode: formData.dictCode,
+          imgUrl: formData.imgUrl,
+          attachUrl:formData.attachUrl
           // "updateTime": ""
         }).then(() => {
           ElMessage.success("新增成功")
@@ -61,10 +72,7 @@ const handleCreate = () => {
           getTableData()
         })
       } else {
-        announcementupdate({
-          id: currentUpdateId.value,
-          username: formData.username
-        }).then(() => {
+        announcementupdate(formData).then(() => {
           ElMessage.success("修改成功")
           dialogVisible.value = false
           getTableData()
@@ -112,7 +120,7 @@ const handleUpdate = (row: IGetTableData) => {
 const tableData = ref<IGetTableData[]>([])
 const searchFormRef = ref<FormInstance | null>(null)
 const searchData = reactive({
-  type: "",
+  dictCode: "",
   title: ""
 })
 const getTableData = () => {
@@ -121,9 +129,10 @@ const getTableData = () => {
     currentPage: paginationData.currentPage,
     size: paginationData.pageSize,
     state: "0",
-    title: formData.title,
+    title: searchData.title,
     // txt: formData.txt,
-    type: formData.type
+    dictCode: searchData.dictCode,
+    type:0
   })
     .then((res) => {
       paginationData.total = res?.datas?.length
@@ -177,8 +186,31 @@ const handleExceed: UploadProps["onExceed"] = (files, uploadFiles) => {
 }
 const handleAvatarSuccess = (res: any, file: any) => {
   imageUrl.value = URL.createObjectURL(file.raw)
-  formData.ImagePath = res.data
+  formData.imgUrl = res.data
 }
+
+
+
+const getTableDataDetail = () => {
+  queryDictionariesDetailLike({
+    page: 1,
+    size: 100000,
+    parentCode: "open_announcement_type", 
+    type: 1
+    // username: searchData.username || undefined,
+    // phone: searchData.phone || undefined
+  })
+    .then((res: any) => {
+      console.log(res)
+      optionsType.value = res?.datas
+    })
+    .catch(() => {
+      optionsType.value = []
+    })
+}
+onMounted(() => {
+  getTableDataDetail()
+})
 //#endregion
 
 /** 监听分页参数的变化 */
@@ -194,10 +226,16 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
         </el-form-item>
         <el-form-item prop="phone" label="公告类型">
           <!-- <el-input v-model="searchData.phone" placeholder="请输入" /> -->
-          <el-select style="width: 200px" v-model="searchData.type" placeholder="Activity zone">
-            <el-option label="Zone one" value="shanghai" />
-            <el-option label="Zone two" value="beijing" />
+          <el-select style="width: 200px" v-model="searchData.dictCode" placeholder="公告类型">
+            <!-- <el-option label="Zone one" value="shanghai" />
+            <el-option label="Zone two" value="beijing" /> -->
+            <el-option v-for="item in optionsType" :key="item.dictId" :label="item.dictName" :value="item.dictId">
+            </el-option>
           </el-select>
+
+
+
+          
         </el-form-item>
         <el-form-item>
           <el-button type="primary" :icon="Search" @click="handleSearch">查询</el-button>
@@ -266,9 +304,11 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
         </el-form-item>
         <el-form-item prop="type" label="公告类型">
           <!-- <el-input v-model="formData.password" placeholder="请输入" /> -->
-          <el-select v-model="formData.type" placeholder="Activity zone">
-            <el-option label="Zone one" value="shanghai" />
-            <el-option label="Zone two" value="beijing" />
+          <el-select style="width: 200px" v-model="formData.dictCode" placeholder="公告类型">
+            <!-- <el-option label="Zone one" value="shanghai" />
+            <el-option label="Zone two" value="beijing" /> -->
+            <el-option v-for="item in optionsType" :key="item.dictId" :label="item.dictName" :value="item.dictId">
+            </el-option>
           </el-select>
         </el-form-item>
 
@@ -282,9 +322,9 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
           <upload-img @updateFileList="updateFiles"></upload-img>
         </el-form-item> -->
 
-        <el-form-item label="公告图片:" prop="ImagePath">
+        <el-form-item label="公告图片:" prop="imgUrl">
           <!-- //pic为了验证图片是必传的 -->
-          <el-input v-model="formData.ImagePath" style="height: 0px; width: 0px; visibility: hidden"></el-input>
+          <el-input v-model="formData.imgUrl" style="height: 0px; width: 0px; visibility: hidden"></el-input>
           <!-- <upload-img @updateFileList="updateFiles"></upload-img> -->
           <el-upload
             class="avatar-uploader"
@@ -303,9 +343,9 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
           </el-upload>
         </el-form-item>
 
-        <el-form-item label="公告附件:" prop="fileList">
+        <el-form-item label="公告附件:" prop="attachUrl">
           <el-upload
-            v-model="formData.fileList"
+            v-model="formData.attachUrl"
             class="upload-demo"
             multiple
             :on-preview="handlePreview"

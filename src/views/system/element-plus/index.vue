@@ -120,7 +120,7 @@ const searchData = reactive({
 const getTableData = () => {
   loading.value = true
   getTableDataApi({
-    currentPage: paginationData.currentPage,
+    page: paginationData.currentPage,
     size: paginationData.pageSize,
     username: searchData.username || undefined,
     phone: searchData.phone || undefined

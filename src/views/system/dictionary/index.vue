@@ -122,7 +122,7 @@ const handleCreateDetail = () => {
           getTableDataDetail()
         })
       } else {
-        let formDatatemp = JSON.parse(JSON.stringify(formData))
+        let formDatatemp = JSON.parse(JSON.stringify(formDataDetail))
         formDatatemp.type = 2
         updateDictionariesDetail(formDatatemp).then(() => {
           ElMessage.success("修改成功")
@@ -217,8 +217,8 @@ const currentUpdateIdDetail = ref<undefined | string>(undefined)
 
 const handleUpdate = (row: any) => {
   currentUpdateId.value = row.id
-  formData.dicNumber = row.introduction
-  formData.dictCode = row.studyHours
+  formData.dicNumber = row.dicNumber
+  formData.dictCode = row.dictCode
   formData.dictId = row.dictId
   formData.dictName = row.dictName
   formData.dictRemark = row.dictRemark
@@ -231,13 +231,13 @@ const handleUpdate = (row: any) => {
 const handleUpdateDetail = (row: any) => {
   currentUpdateIdDetail.value = row.id
 
-  formData.dicNumber = row.introduction
-  formData.dictCode = row.studyHours
-  formData.dictId = row.dictId
-  formData.dictName = row.dictName
-  formData.dictRemark = row.dictRemark
-  formData.insertTime = row.insertTime
-  formData.updateTime = row.updateTime
+  formDataDetail.dicNumber = row.dicNumber
+  formDataDetail.dictCode = row.dictCode
+  formDataDetail.dictId = row.dictId
+  formDataDetail.dictName = row.dictName
+  formDataDetail.dictRemark = row.dictRemark
+  formDataDetail.insertTime = row.insertTime
+  formDataDetail.updateTime = row.updateTime
 
   dialogVisibleDetail.value = true
 }
@@ -533,7 +533,7 @@ watch([() => paginationData1.currentPage, () => paginationData1.pageSize], getTa
               <el-form-item prop="dicNumber" label="排序号">
                 <el-input-number
                   v-model="formDataDetail.dicNumber"
-                  :min="1"
+                  :min="0"
                   :max="1000"
                   label="排序号"
                 ></el-input-number>
